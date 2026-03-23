@@ -1993,38 +1993,79 @@ function updateTimerUI() {
   document.getElementById('play-btn').textContent = timerRunning ? '⏸ PAUZE' : '▶ START';
 }
 
+let timerEndTime = null;
+
 function toggleTimer() {
+  try { _getAudioCtx().resume(); } catch(e) {}
   if(timerRunning) {
     clearInterval(timerInterval);
     timerRunning = false;
+    timerEndTime = null;
     document.getElementById('play-btn').textContent = '▶ VERDER';
   } else {
     timerRunning = true;
+    timerEndTime = Date.now() + phaseSecsLeft * 1000;
     document.getElementById('play-btn').textContent = '⏸ PAUZE';
-    timerInterval = setInterval(timerTick, 1000);
+    timerInterval = setInterval(timerTick, 500);
   }
 }
 
 function timerTick() {
-  totalSecsElapsed++;
-  phaseSecsLeft--;
-
-  if(phaseSecsLeft <= 0) {
-    // Advance phase
+  const remaining = Math.round((timerEndTime - Date.now()) / 1000);
+  if(remaining <= 0) {
+    totalSecsElapsed += phaseSecsLeft;
+    phaseSecsLeft = 0;
     phaseIdx++;
     if(phaseIdx >= phases.length) {
-      // Done!
       clearInterval(timerInterval);
       timerRunning = false;
+      timerEndTime = null;
+      playBeep('finish');
       showFinished();
       return;
     }
     phaseSecsLeft = phases[phaseIdx].sec;
-    // Vibrate on phase change
+    timerEndTime = Date.now() + phaseSecsLeft * 1000;
+    playBeep('phase');
     if(navigator.vibrate) navigator.vibrate([200,100,200]);
+  } else {
+    const elapsed = phaseSecsLeft - remaining;
+    totalSecsElapsed += Math.max(elapsed, 0);
+    phaseSecsLeft = remaining;
   }
   updateTimerUI();
 }
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && timerRunning && timerEndTime) {
+    const remaining = Math.round((timerEndTime - Date.now()) / 1000);
+    if (remaining <= 0) {
+      let leftover = Math.abs(remaining);
+      phaseIdx++;
+      while (phaseIdx < phases.length) {
+        if (leftover < phases[phaseIdx].sec) {
+          phaseSecsLeft = phases[phaseIdx].sec - leftover;
+          timerEndTime = Date.now() + phaseSecsLeft * 1000;
+          playBeep('phase');
+          break;
+        }
+        leftover -= phases[phaseIdx].sec;
+        phaseIdx++;
+      }
+      if (phaseIdx >= phases.length) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        timerEndTime = null;
+        playBeep('finish');
+        showFinished();
+        return;
+      }
+    } else {
+      phaseSecsLeft = remaining;
+    }
+    updateTimerUI();
+  }
+});
 
 function skipPhase() {
   phaseIdx++;
@@ -2080,6 +2121,34 @@ function showFinished() {
 function finishWorkout() {
   renderHome();
   openWeek(currentWeekIdx);
+}
+
+
+// ── AUDIO (Web Audio API) ──
+let _audioCtx = null;
+function _getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _audioCtx;
+}
+function playBeep(type) {
+  try {
+    const ctx = _getAudioCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+    const configs = {
+      phase:  [{ freq:523,start:0,dur:.15},{freq:659,start:.18,dur:.15},{freq:784,start:.36,dur:.30}],
+      finish: [{ freq:523,start:0,dur:.12},{freq:659,start:.15,dur:.12},{freq:784,start:.30,dur:.12},{freq:1047,start:.45,dur:.40}],
+      beep:   [{ freq:880,start:0,dur:.20}],
+    };
+    const now = ctx.currentTime;
+    (configs[type]||configs.beep).forEach(({freq,start,dur})=>{
+      const osc=ctx.createOscillator(), gain=ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type='sine'; osc.frequency.setValueAtTime(freq,now+start);
+      gain.gain.setValueAtTime(.4,now+start);
+      gain.gain.exponentialRampToValueAtTime(.001,now+start+dur);
+      osc.start(now+start); osc.stop(now+start+dur+.05);
+    });
+  } catch(e){ console.warn('Audio:',e); }
 }
 
 // ===================== VRIJE LOOP =====================
@@ -2170,16 +2239,25 @@ function toggleFreeRunTimer() {
     frTimerRunning = true;
     document.getElementById('fr-play-btn').textContent = '⏸ Pauzeer';
     document.getElementById('fr-phase-label').textContent = 'LOOP! 💪';
+    let frEndTime = frMode === 'time' ? Date.now() + (frTargetSecs - frSecsElapsed) * 1000 : null;
     frTimerInterval = setInterval(() => {
-      frSecsElapsed++;
-      updateFreeRunUI();
-      // Tijdmodus: automatisch stoppen als doel bereikt
-      if (frMode === 'time' && frSecsElapsed >= frTargetSecs) {
-        clearInterval(frTimerInterval);
-        frTimerRunning = false;
-        showFreeRunDone();
+      if (frMode === 'time' && frEndTime) {
+        const remaining = Math.round((frEndTime - Date.now()) / 1000);
+        frSecsElapsed = frTargetSecs - remaining;
+        if (remaining <= 0) {
+          frSecsElapsed = frTargetSecs;
+          updateFreeRunUI();
+          clearInterval(frTimerInterval);
+          frTimerRunning = false;
+          playBeep('finish');
+          showFreeRunDone();
+          return;
+        }
+      } else {
+        frSecsElapsed++;
       }
-    }, 1000);
+      updateFreeRunUI();
+    }, 500);
   }
 }
 
