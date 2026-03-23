@@ -2027,7 +2027,7 @@ function timerTick() {
     phaseSecsLeft = phases[phaseIdx].sec;
     timerEndTime = Date.now() + phaseSecsLeft * 1000;
     playBeep('phase');
-    if(navigator.vibrate) navigator.vibrate([200,100,200]);
+    vibrateAndFlash('phase');
   } else {
     const elapsed = phaseSecsLeft - remaining;
     totalSecsElapsed += Math.max(elapsed, 0);
@@ -2336,6 +2336,31 @@ if (localStorage.getItem('str_programId')) {
 } else {
   showScreen('program-select');
 }
+</script>
+
+<script>
+// Trilsignaal voor fase wissel
+function vibrateAndFlash(type) {
+  try {
+    if (navigator.vibrate) {
+      navigator.vibrate(type === 'finish' ? [300,100,300,100,500] : [200,100,200]);
+    }
+  } catch(e) {}
+}
+// Voeg trillen toe aan bestaande fase-wissels
+(function() {
+  var orig = window.showFinished;
+  if (orig) window.showFinished = function() { vibrateAndFlash('finish'); return orig.apply(this, arguments); };
+  var orig2 = window.showFreeRunDone;
+  if (orig2) window.showFreeRunDone = function() { vibrateAndFlash('finish'); return orig2.apply(this, arguments); };
+  var orig3 = window.showToast;
+  if (orig3) window.showToast = function(msg) {
+    if (msg && (msg.includes('Set voltooid') || msg.includes('klaar') || msg.includes('Klaar') || msg.includes('voltooid'))) {
+      vibrateAndFlash('finish');
+    }
+    return orig3.apply(this, arguments);
+  };
+})();
 </script>
 </body>
 </html>
