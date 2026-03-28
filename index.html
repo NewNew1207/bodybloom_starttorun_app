@@ -2,6 +2,13 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Body Bloom Running">
+<meta name="theme-color" content="#1e2330">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231e2330'/><text y='.9em' font-size='80' x='10'>🏃</text></svg>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Body•Bloom Running 🏃</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -998,9 +1005,114 @@
     align-items: center;
     justify-content: center;
   }
+
+/* ACCESS MODAL */
+.access-overlay {
+  position: fixed; inset: 0;
+  background: rgba(10,12,20,.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.access-overlay.hidden { display: none; }
+.access-box {
+  background: #161a2a;
+  border: 1px solid #ff5533;
+  border-radius: 20px;
+  padding: 36px 32px;
+  max-width: 420px; width: 100%;
+  text-align: center;
+}
+.access-logo {
+  font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+  color: #ff5533; margin-bottom: 12px;
+}
+.access-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px; color: white; margin-bottom: 8px; line-height: 1;
+}
+.access-sub {
+  font-size: 12px; color: #666; margin-bottom: 24px; font-weight: 300;
+}
+.access-input {
+  width: 100%; padding: 14px 18px;
+  background: #0d0f14; border: 1.5px solid #333;
+  border-radius: 50px; color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; text-align: center; letter-spacing: 2px;
+  outline: none; margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.access-input:focus { border-color: #ff5533; }
+.access-btn {
+  width: 100%; padding: 14px;
+  background: #ff5533; border: none; border-radius: 50px;
+  color: white; font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px; letter-spacing: 2px; cursor: pointer;
+  transition: all .2s;
+}
+.access-btn:hover { background: #e04420; transform: translateY(-2px); }
+.access-error {
+  color: #ff5533; font-size: 11px; margin-top: 8px;
+  display: none; text-align: center;
+}
+.access-link {
+  font-size: 10px; color: #555; margin-top: 16px;
+}
+.access-link a { color: #ff5533; }
+
+
+.prog-reset-btn {
+  display: block;
+  width: calc(100% - 32px);
+  margin: 0 16px 14px;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 50px;
+  color: #666;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+}
+.prog-reset-btn:hover {
+  border-color: #ff5533;
+  color: #ff5533;
+}
+
 </style>
 </head>
 <body>
+
+<!-- PWA BANNER -->
+<div id="strPwaBanner" style="display:none;background:#ff5533;color:white;padding:10px 20px;text-align:center;position:sticky;top:0;z-index:100;">
+  <span style="font-size:12px;">Installeer de app op je gsm!</span>
+  <button onclick="installSTRPWA()" style="background:white;color:#ff5533;border:none;border-radius:50px;padding:4px 14px;font-size:11px;font-weight:700;cursor:pointer;margin-left:8px;">Installeer</button>
+  <button onclick="document.getElementById('strPwaBanner').style.display='none'" style="background:transparent;border:none;color:rgba(255,255,255,.7);cursor:pointer;margin-left:6px;font-size:16px;">x</button>
+</div>
+
+<!-- TOEGANGSCODE MODAL -->
+<div class="access-overlay hidden" id="accessOverlay">
+  <div class="access-box">
+    <div class="access-logo">Body Bloom Running</div>
+    <div class="access-title">START TO RUN</div>
+    <div class="access-sub">Voer jouw persoonlijke toegangscode in</div>
+    <input type="text" class="access-input" id="strAccessInput"
+      placeholder="Jouw code (bv. STR-LISA-2026)"
+      maxlength="20"
+      oninput="this.value=this.value.toUpperCase()"
+      onkeydown="if(event.key==='Enter')checkSTRCode()">
+    <button class="access-btn" onclick="checkSTRCode()">TOEGANG KRIJGEN</button>
+    <div class="access-error" id="strAccessError">Ongeldige code. Probeer opnieuw.</div>
+    <div class="access-link">Nog geen code? Koop de app via Instagram DM voor slechts &euro;9,99</div>
+  </div>
+</div>
+
+
 
 <!-- PROGRAM SELECT SCREEN -->
 <div class="screen active" id="program-select">
@@ -1800,6 +1912,15 @@ function renderProgramSelect() {
       </div>` : ''}
     `;
     if (!isLocked) card.onclick = () => selectProgram(id);
+
+    // Add reset button if program has progress
+    if (done > 0) {
+      const resetBtn = document.createElement('button');
+      resetBtn.className = 'prog-reset-btn';
+      resetBtn.textContent = '↺ Programma resetten';
+      resetBtn.onclick = (e) => resetProgram(id, e);
+      card.appendChild(resetBtn);
+    }
     container.appendChild(card);
   });
 }
@@ -2027,7 +2148,7 @@ function timerTick() {
     phaseSecsLeft = phases[phaseIdx].sec;
     timerEndTime = Date.now() + phaseSecsLeft * 1000;
     playBeep('phase');
-    vibrateAndFlash('phase');
+    if(navigator.vibrate) navigator.vibrate([200,100,200]);
   } else {
     const elapsed = phaseSecsLeft - remaining;
     totalSecsElapsed += Math.max(elapsed, 0);
@@ -2336,31 +2457,94 @@ if (localStorage.getItem('str_programId')) {
 } else {
   showScreen('program-select');
 }
-</script>
 
-<script>
-// Trilsignaal voor fase wissel
-function vibrateAndFlash(type) {
-  try {
-    if (navigator.vibrate) {
-      navigator.vibrate(type === 'finish' ? [300,100,300,100,500] : [200,100,200]);
-    }
-  } catch(e) {}
+// ── TOEGANGSCODES START TO RUN ──
+const STR_VALID_CODES = [
+  'STR-DEMO-2026',     // Demo code voor testen
+  'STR-TEST-2026',     // Test code
+  // Voeg hier nieuwe klantcodes toe:
+  // 'STR-NAAM-2026',
+];
+
+function checkSTRCode() {
+  const input = document.getElementById('strAccessInput').value.trim().toUpperCase();
+  const errorEl = document.getElementById('strAccessError');
+  if (STR_VALID_CODES.includes(input)) {
+    localStorage.setItem('str_access', input);
+    document.getElementById('accessOverlay').classList.add('hidden');
+    errorEl.style.display = 'none';
+  } else {
+    errorEl.style.display = 'block';
+    document.getElementById('strAccessInput').style.borderColor = '#ff5533';
+    setTimeout(() => { document.getElementById('strAccessInput').style.borderColor = ''; }, 2000);
+  }
 }
-// Voeg trillen toe aan bestaande fase-wissels
-(function() {
-  var orig = window.showFinished;
-  if (orig) window.showFinished = function() { vibrateAndFlash('finish'); return orig.apply(this, arguments); };
-  var orig2 = window.showFreeRunDone;
-  if (orig2) window.showFreeRunDone = function() { vibrateAndFlash('finish'); return orig2.apply(this, arguments); };
-  var orig3 = window.showToast;
-  if (orig3) window.showToast = function(msg) {
-    if (msg && (msg.includes('Set voltooid') || msg.includes('klaar') || msg.includes('Klaar') || msg.includes('voltooid'))) {
-      vibrateAndFlash('finish');
-    }
-    return orig3.apply(this, arguments);
-  };
-})();
+
+// ── PWA INSTALL ──
+let strDeferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  strDeferredPrompt = e;
+  document.getElementById('strPwaBanner').style.display = 'block';
+});
+function installSTRPWA() {
+  if (strDeferredPrompt) {
+    strDeferredPrompt.prompt();
+    strDeferredPrompt.userChoice.then(() => {
+      strDeferredPrompt = null;
+      document.getElementById('strPwaBanner').style.display = 'none';
+    });
+  }
+}
+
+// ── ACCESS CHECK ON LOAD ──
+window.addEventListener('DOMContentLoaded', function() {
+  const saved = localStorage.getItem('str_access');
+  if (!saved || !STR_VALID_CODES.includes(saved)) {
+    document.getElementById('accessOverlay').classList.remove('hidden');
+  }
+});
+
+
+function resetProgram(id, event) {
+  event.stopPropagation(); // Don't open the program
+  const prog = PROGRAMS[id];
+  if (!prog) return;
+  if (!confirm('Wil je ' + prog.title + ' volledig resetten? Al je voortgang wordt gewist.')) return;
+
+  // Remove all completed workouts for this program
+  completedWorkouts = completedWorkouts.filter(key => !key.startsWith(id + '_'));
+  localStorage.setItem('str_completed', JSON.stringify(completedWorkouts));
+
+  // Reset week and day for this program
+  localStorage.removeItem('str_weekIdx_' + id);
+  localStorage.removeItem('str_dayIdx_' + id);
+
+  // If this is the active program, reset current state too
+  if (currentProgramId === id) {
+    currentWeekIdx = 0;
+    currentDayIdx = 0;
+    localStorage.setItem('str_weekIdx', '0');
+    localStorage.setItem('str_dayIdx', '0');
+  }
+
+  renderProgramSelect();
+  showToast(prog.title + ' gereset! Veel succes! 💪');
+}
+
+function showToast(msg) {
+  let t = document.getElementById('str-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'str-toast';
+    t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#ff5533;color:white;padding:12px 24px;border-radius:50px;font-size:12px;letter-spacing:1px;text-transform:uppercase;transition:transform .4s;z-index:999;white-space:nowrap;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(80px)'; }, 3000);
+}
+
 </script>
 </body>
 </html>
