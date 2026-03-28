@@ -1,0 +1,2550 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Body Bloom Running">
+<meta name="theme-color" content="#1e2330">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231e2330'/><text y='.9em' font-size='80' x='10'>🏃</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Body•Bloom Running 🏃</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a22;
+    --card: #1e2330;
+    --accent: #ff5533;
+    --accent2: #ff8c42;
+    --green: #3ddc84;
+    --text: #f0f2f7;
+    --muted: #6b7280;
+    --border: #2a2f3e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    overflow-x: hidden;
+  }
+
+  /* SCREENS */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* HOME SCREEN */
+  #home {
+    background: linear-gradient(160deg, #0d0f14 0%, #1a0f1f 50%, #0d1520 100%);
+    padding: 0;
+  }
+
+  .home-hero {
+    padding: 60px 28px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .home-hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(255,85,51,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    line-height: 0.9;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .hero-title span { color: var(--accent); }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 280px;
+  }
+
+  .progress-overview {
+    margin: 0 20px 24px;
+    background: var(--card);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .prog-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .prog-weeks {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .prog-dot {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    background: var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  .prog-dot.done { background: var(--green); color: #0d0f14; }
+  .prog-dot.current { background: var(--accent); color: white; }
+  .prog-dot.current::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 9px;
+    border: 2px solid var(--accent);
+    opacity: 0.4;
+  }
+
+  .prog-text {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .prog-text strong { color: var(--text); }
+
+  .week-list {
+    padding: 0 20px 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .week-card {
+    background: var(--card);
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+    active: transform: scale(0.98);
+  }
+
+  .week-card:active { transform: scale(0.98); }
+  .week-card.current-week { border-color: var(--accent); }
+  .week-card.done-week { opacity: 0.65; }
+
+  .week-card-inner {
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .week-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--border);
+    line-height: 1;
+    min-width: 40px;
+    transition: color 0.2s;
+  }
+
+  .week-card.current-week .week-num { color: var(--accent); }
+  .week-card.done-week .week-num { color: var(--green); }
+
+  .week-info { flex: 1; }
+
+  .week-name {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 3px;
+  }
+
+  .week-detail {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .week-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .badge-done { background: rgba(61,220,132,0.15); color: var(--green); }
+  .badge-current { background: rgba(255,85,51,0.15); color: var(--accent); }
+  .badge-locked { background: var(--border); color: var(--muted); }
+
+  /* WEEK DETAIL SCREEN */
+  #week-detail { background: var(--bg); }
+
+  .week-header {
+    padding: 50px 24px 24px;
+    background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  }
+
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    width: fit-content;
+  }
+
+  .back-btn:active { opacity: 0.6; }
+
+  .week-detail-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .week-detail-sub {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .day-list {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 40px;
+  }
+
+  .day-card {
+    background: var(--card);
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+
+  .day-card:active { transform: scale(0.98); }
+
+  .day-card-inner {
+    padding: 18px 20px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .day-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .day-icon.run { background: rgba(255,85,51,0.15); }
+  .day-icon.rest { background: rgba(107,114,128,0.15); }
+  .day-icon.optional { background: rgba(61,220,132,0.1); }
+
+  .day-info { flex: 1; }
+
+  .day-name {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+
+  .day-training {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+
+  .day-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .day-tag {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--border);
+    color: var(--muted);
+  }
+
+  .day-tag.duration { background: rgba(255,140,66,0.15); color: var(--accent2); }
+
+  .start-btn {
+    margin: 0 20px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 18px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    width: calc(100% - 40px);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .start-btn:active { transform: scale(0.97); opacity: 0.9; }
+
+  /* TIMER SCREEN */
+  #timer-screen {
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #timer-screen::before {
+    content: '';
+    position: absolute;
+    bottom: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,85,51,0.08) 0%, transparent 60%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .timer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 50px 24px 20px;
+  }
+
+  .timer-week-info {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .timer-week-info strong { color: var(--text); }
+
+  .stop-btn {
+    background: var(--border);
+    border: none;
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .timer-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .phase-indicator {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .phase-pip {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+
+  .phase-pip.active { background: var(--accent); transform: scale(1.4); }
+  .phase-pip.done { background: var(--green); }
+
+  .phase-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 4px;
+    margin-bottom: 12px;
+    transition: color 0.3s;
+  }
+
+  .phase-label.run-phase { color: var(--accent); }
+  .phase-label.walk-phase { color: var(--green); }
+
+  .big-timer {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 120px;
+    line-height: 1;
+    letter-spacing: -2px;
+    transition: color 0.3s;
+    text-align: center;
+  }
+
+  .big-timer.run-phase { color: var(--text); }
+  .big-timer.walk-phase { color: var(--green); }
+
+  .timer-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .interval-info {
+    margin-top: 32px;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 16px 24px;
+    border: 1px solid var(--border);
+    text-align: center;
+    min-width: 220px;
+  }
+
+  .interval-current {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .interval-next {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .interval-next span { color: var(--accent2); }
+
+  .round-counter {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--text);
+  }
+
+  .timer-controls {
+    padding: 0 24px 50px;
+    display: flex;
+    gap: 16px;
+  }
+
+  .ctrl-btn {
+    flex: 1;
+    border: none;
+    border-radius: 18px;
+    padding: 20px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .ctrl-btn:active { transform: scale(0.96); }
+
+  .ctrl-play {
+    background: var(--accent);
+    color: white;
+  }
+
+  .ctrl-skip {
+    background: var(--card);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-size: 15px;
+  }
+
+  /* FINISHED SCREEN */
+  #finished { 
+    background: linear-gradient(160deg, #0d0f14, #0d2015);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 28px;
+  }
+
+  .finish-emoji { font-size: 80px; margin-bottom: 24px; }
+
+  .finish-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    color: var(--green);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .finish-sub {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+
+  .finish-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 40px;
+    width: 100%;
+  }
+
+  .stat-box {
+    flex: 1;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 16px 12px;
+    border: 1px solid var(--border);
+  }
+
+  .stat-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--green);
+  }
+
+  .stat-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .finish-btn {
+    width: 100%;
+    background: var(--green);
+    color: #0d0f14;
+    border: none;
+    border-radius: 16px;
+    padding: 18px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    cursor: pointer;
+  }
+
+  /* TIPS SCREEN */
+  #tips-screen {
+    background: var(--bg);
+  }
+
+  .tips-header {
+    padding: 50px 24px 24px;
+    background: var(--surface);
+  }
+
+  .tips-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 40px;
+  }
+
+  .tip-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .tip-title {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tip-text {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .tip-highlight {
+    background: rgba(255,85,51,0.1);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--accent2);
+    line-height: 1.6;
+  }
+
+  /* PROGRAM SELECTOR */
+  #program-select {
+    background: linear-gradient(160deg, #0d0f14 0%, #1a0f1f 50%, #0d1520 100%);
+    padding: 0;
+    overflow-y: auto;
+  }
+
+  .ps-hero {
+    padding: 60px 28px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ps-hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(255,85,51,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .ps-eyebrow {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .ps-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 0.95;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .ps-title span { color: var(--accent); }
+
+  .ps-sub {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .prog-cards {
+    padding: 8px 20px 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .prog-card {
+    background: var(--card);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+    position: relative;
+  }
+
+  .prog-card:active { transform: scale(0.98); }
+
+  .prog-card.locked {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .prog-card-banner {
+    padding: 20px 20px 16px;
+    position: relative;
+  }
+
+  .prog-card-banner.intro { background: linear-gradient(135deg, #1a1a08, #2d2a04); }
+  .prog-card-banner.str { background: linear-gradient(135deg, #1a0f0a, #2d1408); }
+  .prog-card-banner.ten { background: linear-gradient(135deg, #0a1a12, #0d2d1a); }
+  .prog-card-banner.half { background: linear-gradient(135deg, #0a0d1a, #0d1228); }
+
+  .prog-card-emoji { font-size: 2.5rem; margin-bottom: 8px; }
+
+  .prog-card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .prog-card-banner.intro .prog-card-title { color: #f5c842; }
+  .prog-card-banner.str .prog-card-title { color: var(--accent); }
+  .prog-card-banner.ten .prog-card-title { color: var(--green); }
+  .prog-card-banner.half .prog-card-title { color: #7eb8f7; }
+
+  .prog-card-goal {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .prog-card-meta {
+    padding: 14px 20px;
+    display: flex;
+    gap: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .prog-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .prog-meta-val {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .prog-meta-lbl {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .prog-card-progress {
+    padding: 10px 20px 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .prog-progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+
+  .prog-progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .prog-progress-fill.intro { background: #f5c842; }
+  .prog-progress-fill.str { background: var(--accent); }
+  .prog-progress-fill.ten { background: var(--green); }
+  .prog-progress-fill.half { background: #7eb8f7; }
+
+  .prog-progress-text {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .prog-lock-badge {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .prog-active-badge {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: rgba(255,85,51,0.15);
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 12px 20px 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .copyright span {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: rgba(22,26,34,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 12px 0 24px;
+    z-index: 100;
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 6px;
+    transition: opacity 0.15s;
+  }
+
+  .nav-item:active { opacity: 0.6; }
+
+  .nav-icon { font-size: 22px; }
+
+  .nav-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  .nav-item.active .nav-label { color: var(--accent); }
+
+  /* VRIJE LOOP */
+  .free-run-card {
+    margin: 0 20px 16px;
+    background: linear-gradient(135deg, #1a1a0f, #2d2808);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .free-run-card:active { transform: scale(0.98); }
+  .free-run-banner {
+    padding: 20px 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .free-run-emoji { font-size: 2.2rem; }
+  .free-run-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #f5c842;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .free-run-sub { font-size: 13px; color: var(--muted); }
+  .free-run-options {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .free-run-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #f5c842;
+    color: #f5c842;
+    font-size: 12px;
+    font-weight: 700;
+    background: rgba(245,200,66,0.08);
+  }
+
+  /* VRIJE LOOP SCHERM */
+  #free-run-screen {
+    background: linear-gradient(160deg, #0d0f14 0%, #1a1a08 50%, #0d1520 100%);
+    padding: 0;
+    overflow-y: auto;
+  }
+  .fr-header {
+    padding: 50px 28px 24px;
+    position: relative;
+  }
+  .fr-back { color: var(--muted); font-size: 14px; cursor: pointer; margin-bottom: 16px; display: inline-block; }
+  .fr-back:active { opacity: 0.6; }
+  .fr-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    line-height: 0.95;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .fr-title span { color: #f5c842; }
+  .fr-sub { font-size: 14px; color: var(--muted); }
+
+  .fr-section {
+    margin: 0 20px 24px;
+    background: var(--card);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .fr-section-title {
+    padding: 14px 20px 10px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .fr-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+  }
+  .fr-option {
+    background: var(--card);
+    padding: 18px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .fr-option:active, .fr-option.selected { background: rgba(245,200,66,0.12); }
+  .fr-option.selected { border: 2px solid #f5c842; border-radius: 2px; }
+  .fr-option-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: #f5c842;
+    line-height: 1;
+  }
+  .fr-option-lbl { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .fr-option-est { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .fr-start-btn {
+    margin: 0 20px 100px;
+    width: calc(100% - 40px);
+    padding: 18px;
+    background: #f5c842;
+    color: #0d0f14;
+    border: none;
+    border-radius: 16px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .fr-start-btn:disabled { opacity: 0.3; cursor: default; }
+  .fr-start-btn:active:not(:disabled) { opacity: 0.8; }
+
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.15); opacity: 0; }
+  }
+
+  .pulse-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    animation: pulse-ring 1.2s ease-out infinite;
+  }
+
+  .timer-circle-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%,60% { transform: translateX(-6px); }
+    40%,80% { transform: translateX(6px); }
+  }
+
+  .shake { animation: shake 0.4s ease; }
+
+  /* Ring timer */
+  .ring-container {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 0 auto 24px;
+  }
+
+  .ring-svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
+  .ring-progress { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.5s linear, stroke 0.3s; }
+
+  .ring-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+/* ACCESS MODAL */
+.access-overlay {
+  position: fixed; inset: 0;
+  background: rgba(10,12,20,.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.access-overlay.hidden { display: none; }
+.access-box {
+  background: #161a2a;
+  border: 1px solid #ff5533;
+  border-radius: 20px;
+  padding: 36px 32px;
+  max-width: 420px; width: 100%;
+  text-align: center;
+}
+.access-logo {
+  font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+  color: #ff5533; margin-bottom: 12px;
+}
+.access-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px; color: white; margin-bottom: 8px; line-height: 1;
+}
+.access-sub {
+  font-size: 12px; color: #666; margin-bottom: 24px; font-weight: 300;
+}
+.access-input {
+  width: 100%; padding: 14px 18px;
+  background: #0d0f14; border: 1.5px solid #333;
+  border-radius: 50px; color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; text-align: center; letter-spacing: 2px;
+  outline: none; margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.access-input:focus { border-color: #ff5533; }
+.access-btn {
+  width: 100%; padding: 14px;
+  background: #ff5533; border: none; border-radius: 50px;
+  color: white; font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px; letter-spacing: 2px; cursor: pointer;
+  transition: all .2s;
+}
+.access-btn:hover { background: #e04420; transform: translateY(-2px); }
+.access-error {
+  color: #ff5533; font-size: 11px; margin-top: 8px;
+  display: none; text-align: center;
+}
+.access-link {
+  font-size: 10px; color: #555; margin-top: 16px;
+}
+.access-link a { color: #ff5533; }
+
+
+.prog-reset-btn {
+  display: block;
+  width: calc(100% - 32px);
+  margin: 0 16px 14px;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 50px;
+  color: #666;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+}
+.prog-reset-btn:hover {
+  border-color: #ff5533;
+  color: #ff5533;
+}
+
+</style>
+</head>
+<body>
+
+<!-- PWA BANNER -->
+<div id="strPwaBanner" style="display:none;background:#ff5533;color:white;padding:10px 20px;text-align:center;position:sticky;top:0;z-index:100;">
+  <span style="font-size:12px;">Installeer de app op je gsm!</span>
+  <button onclick="installSTRPWA()" style="background:white;color:#ff5533;border:none;border-radius:50px;padding:4px 14px;font-size:11px;font-weight:700;cursor:pointer;margin-left:8px;">Installeer</button>
+  <button onclick="document.getElementById('strPwaBanner').style.display='none'" style="background:transparent;border:none;color:rgba(255,255,255,.7);cursor:pointer;margin-left:6px;font-size:16px;">x</button>
+</div>
+
+<!-- TOEGANGSCODE MODAL -->
+<div class="access-overlay hidden" id="accessOverlay">
+  <div class="access-box">
+    <div class="access-logo">Body Bloom Running</div>
+    <div class="access-title">START TO RUN</div>
+    <div class="access-sub">Voer jouw persoonlijke toegangscode in</div>
+    <input type="text" class="access-input" id="strAccessInput"
+      placeholder="Jouw code (bv. STR-LISA-2026)"
+      maxlength="20"
+      oninput="this.value=this.value.toUpperCase()"
+      onkeydown="if(event.key==='Enter')checkSTRCode()">
+    <button class="access-btn" onclick="checkSTRCode()">TOEGANG KRIJGEN</button>
+    <div class="access-error" id="strAccessError">Ongeldige code. Probeer opnieuw.</div>
+    <div class="access-link">Nog geen code? Koop de app via Instagram DM voor slechts &euro;9,99</div>
+  </div>
+</div>
+
+
+
+<!-- PROGRAM SELECT SCREEN -->
+<div class="screen active" id="program-select">
+  <div class="ps-hero">
+    <div class="ps-eyebrow">BODY•BLOOM RUNNING</div>
+    <div class="ps-title">KIES JOUW<br><span>PROGRAMMA</span></div>
+    <div class="ps-sub">Van eerste stappen tot halve marathon — jouw traject, jouw tempo 🏃</div>
+  </div>
+  <div class="prog-cards" id="prog-cards"></div>
+
+  <!-- VRIJE LOOP KAART -->
+  <div class="free-run-card" onclick="showScreen('free-run-screen')">
+    <div class="free-run-banner">
+      <div class="free-run-emoji">⚡</div>
+      <div>
+        <div class="free-run-title">VRIJE <span>LOOP</span></div>
+        <div class="free-run-sub">Al ervaren? Loop op tijd of afstand</div>
+      </div>
+    </div>
+    <div class="free-run-options">
+      <div class="free-run-pill">⏱️ Op tijd</div>
+      <div class="free-run-pill">📍 5 km</div>
+      <div class="free-run-pill">📍 10 km</div>
+      <div class="free-run-pill">📍 21 km</div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <div style="width:100%;">
+      <div class="copyright">© 2026 <span>Sofia la Bianca</span> · Body•Bloom</div>
+    </div>
+  </nav>
+</div>
+
+<!-- VRIJE LOOP SCHERM -->
+<div class="screen" id="free-run-screen">
+  <div class="fr-header">
+    <div class="fr-back" onclick="showScreen('program-select')">← Terug</div>
+    <div class="fr-title">VRIJE<br><span>LOOP</span></div>
+    <div class="fr-sub">Kies hoe je wil lopen — de timer doet de rest</div>
+  </div>
+
+  <!-- Modus keuze -->
+  <div style="margin:0 20px 16px;display:flex;gap:8px">
+    <button id="fr-mode-time" onclick="selectFrMode('time')"
+      style="flex:1;padding:12px;border-radius:12px;border:2px solid #f5c842;background:rgba(245,200,66,0.12);color:#f5c842;font-family:'Bebas Neue',sans-serif;font-size:18px;cursor:pointer">
+      ⏱️ OP TIJD
+    </button>
+    <button id="fr-mode-dist" onclick="selectFrMode('dist')"
+      style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:18px;cursor:pointer">
+      📍 OP AFSTAND
+    </button>
+  </div>
+
+  <!-- Tijdopties -->
+  <div class="fr-section" id="fr-time-options">
+    <div class="fr-section-title">Kies je looptijd</div>
+    <div class="fr-options-grid">
+      <div class="fr-option" onclick="selectFrOption('time', 20, '20 min')" id="fro-20">
+        <div class="fr-option-val">20</div>
+        <div class="fr-option-lbl">minuten</div>
+        <div class="fr-option-est">~2-3 km</div>
+      </div>
+      <div class="fr-option" onclick="selectFrOption('time', 30, '30 min')" id="fro-30">
+        <div class="fr-option-val">30</div>
+        <div class="fr-option-lbl">minuten</div>
+        <div class="fr-option-est">~3-4 km</div>
+      </div>
+      <div class="fr-option" onclick="selectFrOption('time', 45, '45 min')" id="fro-45">
+        <div class="fr-option-val">45</div>
+        <div class="fr-option-lbl">minuten</div>
+        <div class="fr-option-est">~5-7 km</div>
+      </div>
+      <div class="fr-option" onclick="selectFrOption('time', 60, '60 min')" id="fro-60">
+        <div class="fr-option-val">60</div>
+        <div class="fr-option-lbl">minuten</div>
+        <div class="fr-option-est">~7-10 km</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Afstandopties -->
+  <div class="fr-section" id="fr-dist-options" style="display:none">
+    <div class="fr-section-title">Kies je afstand</div>
+    <div class="fr-options-grid">
+      <div class="fr-option" onclick="selectFrOption('dist', 5, '5 km')" id="fro-5km">
+        <div class="fr-option-val">5</div>
+        <div class="fr-option-lbl">kilometer</div>
+        <div class="fr-option-est">~25-35 min</div>
+      </div>
+      <div class="fr-option" onclick="selectFrOption('dist', 10, '10 km')" id="fro-10km">
+        <div class="fr-option-val">10</div>
+        <div class="fr-option-lbl">kilometer</div>
+        <div class="fr-option-est">~50-70 min</div>
+      </div>
+      <div class="fr-option" onclick="selectFrOption('dist', 21, '21 km')" id="fro-21km">
+        <div class="fr-option-val">21</div>
+        <div class="fr-option-lbl">kilometer</div>
+        <div class="fr-option-est">~1u45-2u30</div>
+      </div>
+      <div class="fr-option" onclick="selectFrOption('dist', 25, '25 km')" id="fro-25km">
+        <div class="fr-option-val">25</div>
+        <div class="fr-option-lbl">kilometer</div>
+        <div class="fr-option-est">~2u-3u</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="fr-start-btn" id="fr-start-btn" onclick="startFreeRun()" disabled>
+    KIES EEN OPTIE OM TE STARTEN
+  </button>
+</div>
+
+<!-- VRIJE LOOP TIMER SCHERM -->
+<div class="screen" id="free-run-timer">
+  <div class="timer-header">
+    <div class="timer-week-info" id="fr-timer-label">VRIJE LOOP</div>
+    <button class="stop-btn" onclick="stopFreeRun()">✕ Stop</button>
+  </div>
+  <div class="timer-body">
+    <div class="phase-label" id="fr-phase-label">LOOP!</div>
+    <div class="ring-container">
+      <svg class="ring-svg" width="220" height="220" viewBox="0 0 220 220">
+        <circle class="ring-bg" cx="110" cy="110" r="100"/>
+        <circle class="ring-progress" id="fr-ring-prog" cx="110" cy="110" r="100"
+          stroke-dasharray="628" stroke-dashoffset="0" stroke="#f5c842"/>
+      </svg>
+      <div class="ring-center">
+        <div class="big-timer" id="fr-big-timer" style="color:#f5c842">00:00</div>
+        <div class="timer-sub" id="fr-timer-sub">verstreken</div>
+      </div>
+    </div>
+    <div class="interval-info">
+      <div class="interval-current" id="fr-interval-info">Loopt... 💪</div>
+      <div class="round-counter" id="fr-target-label"></div>
+    </div>
+  </div>
+  <div class="timer-controls">
+    <button class="ctrl-btn ctrl-play" id="fr-play-btn" onclick="toggleFreeRunTimer()" style="background:#f5c842;color:#0d0f14">▶ START</button>
+  </div>
+</div>
+
+<!-- VRIJE LOOP FINISH SCHERM -->
+<div class="screen" id="free-run-done">
+  <div class="finish-emoji">⚡</div>
+  <div class="finish-title" style="color:#f5c842">GEDAAN!</div>
+  <div class="finish-sub" id="fr-done-sub">Geweldig gelopen!</div>
+  <div class="finish-stats">
+    <div class="stat-box">
+      <div class="stat-val" id="fr-stat-time" style="color:#f5c842">--</div>
+      <div class="stat-lbl">minuten gelopen</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="fr-stat-target" style="color:#f5c842">--</div>
+      <div class="stat-lbl" id="fr-stat-lbl">doel</div>
+    </div>
+  </div>
+  <button class="finish-btn" onclick="showScreen('program-select')" style="background:#f5c842;color:#0d0f14">TERUG NAAR HOME</button>
+</div>
+
+<!-- HOME / OVERVIEW SCREEN -->
+<div class="screen" id="home">
+  <div class="home-hero">
+    <div class="hero-eyebrow" id="home-eyebrow">8 WEKEN PROGRAMMA</div>
+    <div class="hero-title" id="home-title">START<br><span>TO RUN</span></div>
+    <div class="hero-sub" id="home-sub">Van nul conditie naar 20 minuten non-stop lopen 🏃</div>
+  </div>
+
+  <div class="progress-overview">
+    <div class="prog-label">Jouw voortgang</div>
+    <div class="prog-weeks" id="prog-dots"></div>
+    <div class="prog-text" id="prog-text">Week <strong>1</strong> van 8 · <strong>0</strong> trainingen voltooid</div>
+  </div>
+
+  <div class="week-list" id="week-list"></div>
+
+  <nav class="bottom-nav">
+    <div style="width:100%;">
+      <div class="copyright">© 2026 <span>Sofia la Bianca</span> · Body•Bloom</div>
+      <div style="display:flex;">
+        <div class="nav-item" onclick="showScreen('program-select')">
+          <div class="nav-icon">🏠</div>
+          <div class="nav-label">PROGRAMMA'S</div>
+        </div>
+        <div class="nav-item active" onclick="showScreen('home')">
+          <div class="nav-icon">🗓️</div>
+          <div class="nav-label">SCHEMA</div>
+        </div>
+        <div class="nav-item" onclick="showScreen('tips-screen')">
+          <div class="nav-icon">💡</div>
+          <div class="nav-label">TIPS</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<!-- WEEK DETAIL SCREEN -->
+<div class="screen" id="week-detail">
+  <div class="week-header">
+    <div class="back-btn" onclick="showScreen('home')">
+      ← Terug
+    </div>
+    <div class="week-detail-title" id="wd-title"></div>
+    <div class="week-detail-sub" id="wd-sub"></div>
+  </div>
+  <div class="day-list" id="day-list"></div>
+</div>
+
+<!-- TIMER SCREEN -->
+<div class="screen" id="timer-screen">
+  <div class="timer-header">
+    <div class="timer-week-info" id="timer-week-info"></div>
+    <button class="stop-btn" onclick="stopTimer()">✕ Stop</button>
+  </div>
+
+  <div class="timer-body">
+    <div class="phase-label" id="phase-label">KLAAR?</div>
+
+    <div class="ring-container">
+      <svg class="ring-svg" width="220" height="220" viewBox="0 0 220 220">
+        <circle class="ring-bg" cx="110" cy="110" r="100"/>
+        <circle class="ring-progress" id="ring-prog" cx="110" cy="110" r="100"
+          stroke-dasharray="628" stroke-dashoffset="0" stroke="#ff5533"/>
+      </svg>
+      <div class="ring-center">
+        <div class="big-timer run-phase" id="big-timer">00</div>
+        <div class="timer-sub" id="timer-sub">seconden</div>
+      </div>
+    </div>
+
+    <div class="interval-info">
+      <div class="interval-current" id="interval-current">Interval 1 van 6</div>
+      <div class="round-counter" id="round-counter">RONDE 1</div>
+      <div class="interval-next" id="interval-next">Volgende: <span>wandelen</span></div>
+    </div>
+  </div>
+
+  <div class="timer-controls">
+    <button class="ctrl-btn ctrl-skip" onclick="skipPhase()">SNEL SKIP</button>
+    <button class="ctrl-btn ctrl-play" id="play-btn" onclick="toggleTimer()">▶ START</button>
+  </div>
+</div>
+
+<!-- FINISHED SCREEN -->
+<div class="screen" id="finished">
+  <div class="finish-emoji" id="finish-emoji">🎉</div>
+  <div class="finish-title" id="finish-title">GEDAAN!</div>
+  <div class="finish-sub" id="finish-sub">Super goed gedaan! Elke training telt.</div>
+  <div class="finish-stats">
+    <div class="stat-box">
+      <div class="stat-val" id="stat-time">--</div>
+      <div class="stat-lbl">minuten actief</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="stat-rounds">--</div>
+      <div class="stat-lbl">rondes gelopen</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="stat-week">W1</div>
+      <div class="stat-lbl">week voltooid</div>
+    </div>
+  </div>
+  <button class="finish-btn" onclick="finishWorkout()">TERUG NAAR SCHEMA</button>
+</div>
+
+<!-- TIPS SCREEN -->
+<div class="screen" id="tips-screen">
+  <div class="tips-header">
+    <div class="back-btn" onclick="showScreen('home')">← Terug</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;">TIPS & INFO</div>
+  </div>
+  <div class="tips-content">
+    <div class="tip-card">
+      <div class="tip-title">🔥 Opwarmen & afkoelen</div>
+      <div class="tip-text">Begin elke sessie met 5 minuten rustig wandelen. Eindig ook altijd met 5 minuten afkoelwandeling en doe daarna een paar simpele rekoefeningen voor je kuiten, bovenbenen en heupen.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">💬 Het juiste tempo</div>
+      <div class="tip-text">Looptempo voor beginners: je moet een volledige zin kunnen uitspreken terwijl je loopt. Lukt dat niet? Dan loop je te snel. Slak-tempo is absoluut oké!</div>
+      <div class="tip-highlight">💡 Gebruik de 'praat-test': spreek hardop een paar woorden. Hapert je adem? Vertraag dan!</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">⚡ Pijn vs. spierpijn</div>
+      <div class="tip-text">Spierpijn de dag na het lopen is normaal. Echte pijn (kniepijn, scheenbeenklachten, enkelpijn) is een signaal om te stoppen en rust te nemen. Bij aanhoudende klachten, raadpleeg een arts of kinesist.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">💧 Voeding & hydratatie</div>
+      <div class="tip-text">Drink voldoende water gedurende de dag. Loop bij voorkeur niet vlak na een zware maaltijd. Een lichte snack (banaan, cracker) 30 minuten voor de training geeft je energie.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">👟 Uitrusting</div>
+      <div class="tip-text">Investeer in goede, comfortabele loopschoenen — je voeten zullen je dankbaar zijn. Verder heb je nodig: comfortabele sportkleding, een flesje water, en eventueel een telefoon met muziek of podcast.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">📋 Gouden regels</div>
+      <div class="tip-text">
+        • Loop altijd op een comfortabel tempo<br>
+        • Herstelrust is net zo belangrijk als de training<br>
+        • Sla training over als je ziek bent — geen schuldgevoel<br>
+        • Voelt een week te zwaar? Herhaal die week gewoon<br>
+        • Warm altijd 5 min op met wandelen voor je begint
+      </div>
+    </div>
+    <div style="height:40px;"></div>
+  </div>
+  <nav class="bottom-nav">
+    <div style="width:100%;">
+      <div class="copyright">© 2026 <span>Sofia la Bianca</span> · Body•Bloom</div>
+      <div style="display:flex;">
+        <div class="nav-item" onclick="showScreen('program-select')">
+          <div class="nav-icon">🏠</div>
+          <div class="nav-label">PROGRAMMA'S</div>
+        </div>
+        <div class="nav-item" onclick="showScreen('home')">
+          <div class="nav-icon">🗓️</div>
+          <div class="nav-label">SCHEMA</div>
+        </div>
+        <div class="nav-item active" onclick="showScreen('tips-screen')">
+          <div class="nav-icon">💡</div>
+          <div class="nav-label">TIPS</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<script>
+// ===================== DATA =====================
+const WEEKS_STR = [
+  {
+    title: "Week 1",
+    name: "Beginnen met bewegen",
+    days: [
+      { day: "Maandag", type: "run", emoji: "🏃", training: "1 min lopen / 2 min wandelen × 6", duration: "20 min", note: "Rustig tempo, je kunt nog praten", intervals: [{type:'walk',sec:60},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60}] },
+      { day: "Woensdag", type: "rest", emoji: "😴", training: "Rust of lichte wandeling", duration: "20 min", note: "Herstel is ook training!" },
+      { day: "Vrijdag", type: "run", emoji: "🏃", training: "1 min lopen / 2 min wandelen × 6", duration: "20 min", note: "Zelfde als maandag" , intervals: [{type:'walk',sec:60},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60}] },
+      { day: "Weekend", type: "optional", emoji: "🚶", training: "Rustige wandeling", duration: "30 min", note: "Optioneel" },
+    ]
+  },
+  {
+    title: "Week 2",
+    name: "Ritme opbouwen",
+    days: [
+      { day: "Maandag", type: "run", emoji: "🏃", training: "1,5 min lopen / 2 min wandelen × 6", duration: "21 min", note: "Iets langer lopen dan vorige week", intervals: buildIntervals(90,120,6) },
+      { day: "Woensdag", type: "rest", emoji: "😴", training: "Rust of lichte wandeling", duration: "20 min", note: "Benen laten herstellen" },
+      { day: "Vrijdag", type: "run", emoji: "🏃", training: "1,5 min lopen / 2 min wandelen × 6", duration: "21 min", note: "Focus op ademhaling", intervals: buildIntervals(90,120,6) },
+      { day: "Weekend", type: "optional", emoji: "🚶", training: "Rustige wandeling", duration: "30 min", note: "Optioneel" },
+    ]
+  },
+  {
+    title: "Week 3",
+    name: "Uithoudingsvermogen testen",
+    days: [
+      { day: "Maandag", type: "run", emoji: "🏃", training: "2 min lopen / 2 min wandelen × 6", duration: "24 min", note: "Goed gevoel? Geef iets meer gas", intervals: buildIntervals(120,120,6) },
+      { day: "Woensdag", type: "rest", emoji: "😴", training: "Rust of lichte wandeling", duration: "20 min", note: "" },
+      { day: "Vrijdag", type: "run", emoji: "🏃", training: "2 min lopen / 2 min wandelen × 6", duration: "24 min", note: "Tel je stappen — consistent tempo", intervals: buildIntervals(120,120,6) },
+      { day: "Weekend", type: "optional", emoji: "🚶", training: "Rustige wandeling", duration: "30 min", note: "Optioneel" },
+    ]
+  },
+  {
+    title: "Week 4",
+    name: "Halverwege — eerste evaluatie",
+    days: [
+      { day: "Maandag", type: "run", emoji: "🏃", training: "3 min lopen / 2 min wandelen × 5", duration: "25 min", note: "Nieuwe drempel!", intervals: buildIntervals(180,120,5) },
+      { day: "Woensdag", type: "rest", emoji: "😴", training: "Rust", duration: "—", note: "Verdien je rust 💪" },
+      { day: "Vrijdag", type: "run", emoji: "🏃", training: "3 min lopen / 2 min wandelen × 5", duration: "25 min", note: "Luister naar je lichaam", intervals: buildIntervals(180,120,5) },
+      { day: "Weekend", type: "optional", emoji: "🚴", training: "Rustige wandeling of fietstocht", duration: "30 min", note: "Optioneel" },
+    ]
+  },
+  {
+    title: "Week 5",
+    name: "Langere loopblokken",
+    days: [
+      { day: "Maandag", type: "run", emoji: "🏃", training: "4 min lopen / 2 min wandelen × 5", duration: "30 min", note: "Diep ademhalen bij vermoeidheid", intervals: buildIntervals(240,120,5) },
+      { day: "Woensdag", type: "rest", emoji: "😴", training: "Rust of lichte wandeling", duration: "20 min", note: "" },
+      { day: "Vrijdag", type: "run", emoji: "🏃", training: "5 min lopen / 2 min wandelen × 4", duration: "28 min", note: "Halve weg! Goed bezig", intervals: buildIntervals(300,120,4) },
+      { day: "Weekend", type: "optional", emoji: "🚶", training: "Rustige wandeling", duration: "30 min", note: "Optioneel" },
+    ]
+  },
+  {
+    title: "Week 6",
+    name: "Doorzetten",
+    days: [
+      { day: "Maandag", type: "run", emoji: "🏃", training: "6 min lopen / 2 min wandelen × 4", duration: "32 min", note: "Je voelt het verschil al!", intervals: buildIntervals(360,120,4) },
+      { day: "Woensdag", type: "rest", emoji: "😴", training: "Rust", duration: "—", note: "" },
+      { day: "Vrijdag", type: "run", emoji: "🏃", training: "7 min lopen / 2 min wandelen × 3", duration: "27 min", note: "Kort maar krachtig", intervals: buildIntervals(420,120,3) },
+      { day: "Weekend", type: "optional", emoji: "🧘", training: "Rustige wandeling of yoga", duration: "30 min", note: "Optioneel — goed voor herstel" },
+    ]
+  },
+  {
+    title: "Week 7",
+    name: "Bijna continue",
+    days: [
+      { day: "Maandag", type: "run", emoji: "🏃", training: "8 min lopen / 2 min wandelen × 3", duration: "30 min", note: "Snel bijna zonder stop!", intervals: buildIntervals(480,120,3) },
+      { day: "Woensdag", type: "rest", emoji: "😴", training: "Rust of lichte wandeling", duration: "20 min", note: "" },
+      { day: "Vrijdag", type: "run", emoji: "🏃", training: "10 min lopen / 2 min wandelen × 2", duration: "24 min", note: "Twee grote blokken", intervals: buildIntervals(600,120,2) },
+      { day: "Weekend", type: "optional", emoji: "🚶", training: "Rustige wandeling", duration: "30 min", note: "Optioneel" },
+    ]
+  },
+  {
+    title: "Week 8",
+    name: "De finish — 20 min non-stop lopen!",
+    days: [
+      { day: "Maandag", type: "run", emoji: "🏃", training: "12 min lopen / 2 min wandelen × 2", duration: "28 min", note: "Laatste opwarming", intervals: buildIntervals(720,120,2) },
+      { day: "Woensdag", type: "rest", emoji: "😴", training: "Rust", duration: "—", note: "Spaar je energie" },
+      { day: "Vrijdag", type: "run", emoji: "🏆", training: "20 min NON-STOP lopen 🎉", duration: "20+ min", note: "JE HEBT HET GEHAALD!", intervals: [{type:'run',sec:1200}] },
+      { day: "Weekend", type: "optional", emoji: "🥳", training: "Feestje!", duration: "—", note: "Trots zijn mag!" },
+    ]
+  }
+];
+
+function buildIntervals(runSec, walkSec, rounds) {
+  const arr = [{type:'walk', sec:60}]; // warmup walk
+  for(let i=0;i<rounds;i++){
+    arr.push({type:'run', sec:runSec});
+    if(i < rounds-1) arr.push({type:'walk', sec:walkSec});
+  }
+  return arr;
+}
+
+// ===================== PROGRAMS =====================
+const PROGRAMS = {
+  intro: {
+    id: 'intro',
+    title: 'INSTAP PROGRAMMA',
+    goal: 'Van de bank naar buiten — jouw eerste loopervaring in 4 weken',
+    emoji: '🌸',
+    weeks: 4,
+    type: 'intro',
+    eyebrow: '4 WEKEN PROGRAMMA',
+    heroTitle: 'INSTAP<br><span style="color:#f5c842">PROGRAMMA</span>',
+    heroSub: 'Van de bank naar buiten — jouw eerste loopstappen 🌸',
+    color: '#f5c842',
+    weeks_data: null,
+  },
+  str: {
+    id: 'str',
+    title: 'START TO RUN',
+    goal: 'Van nul conditie naar 20 minuten non-stop lopen',
+    emoji: '🏃',
+    weeks: 8,
+    type: 'str',
+    eyebrow: '8 WEKEN PROGRAMMA',
+    heroTitle: 'START<br><span>TO RUN</span>',
+    heroSub: 'Van nul conditie naar 20 minuten non-stop lopen 🏃',
+    color: '#ff5533',
+    weeks_data: null, // filled below
+  },
+  ten: {
+    id: 'ten',
+    title: 'START TO 10KM',
+    goal: 'Van 20 minuten lopen naar 10 kilometer non-stop',
+    emoji: '🏅',
+    weeks: 8,
+    type: 'ten',
+    eyebrow: '8 WEKEN PROGRAMMA',
+    heroTitle: 'START TO<br><span style="color:#3ddc84">10KM</span>',
+    heroSub: 'Van 20 minuten lopen naar 10 kilometer non-stop 🏅',
+    color: '#3ddc84',
+    weeks_data: null,
+  },
+  half: {
+    id: 'half',
+    title: 'HALVE MARATHON',
+    goal: 'Van 10km naar 21,1 kilometer — jouw eerste halve marathon',
+    emoji: '🏆',
+    weeks: 12,
+    type: 'half',
+    eyebrow: '12 WEKEN PROGRAMMA',
+    heroTitle: 'HALVE<br><span style="color:#7eb8f7">MARATHON</span>',
+    heroSub: 'Van 10km naar 21,1 kilometer — jouw eerste halve marathon 🏆',
+    color: '#7eb8f7',
+    weeks_data: null,
+  }
+};
+
+// 4-WEKEN INSTAP PROGRAMMA
+const WEEKS_INTRO = [
+  { title:'Week 1', name:'Eerste stappen', days:[
+    { day:'Maandag',   type:'run',      emoji:'🏃', training:'1 min lopen / 2 min wandelen × 5', duration:'15 min', note:'Rustig — je kunt nog praten tijdens het lopen', intervals:[{type:'walk',sec:60},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60}] },
+    { day:'Dinsdag',   type:'run',      emoji:'🏃', training:'1 min lopen / 2 min wandelen × 5', duration:'15 min', note:'Zelfde als maandag — voel het verschil?', intervals:[{type:'walk',sec:60},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60}] },
+    { day:'Woensdag',  type:'run',      emoji:'🏃', training:'15 min cardio (2 min wandelen, 1 min lopen × 5)', duration:'15 min', note:'Buiten wandelen met loopintervalletjes', intervals:buildIntervals(60,120,5) },
+    { day:'Donderdag', type:'run',      emoji:'🏃', training:'1 min lopen / 2 min wandelen × 5', duration:'15 min', note:'Rustig tempo houden', intervals:[{type:'walk',sec:60},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60}] },
+    { day:'Vrijdag',   type:'run',      emoji:'🏃', training:'1 min lopen / 2 min wandelen × 5', duration:'15 min', note:'Laatste training van de week!', intervals:[{type:'walk',sec:60},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60},{type:'walk',sec:120},{type:'run',sec:60}] },
+    { day:'Zaterdag',  type:'run',      emoji:'🏁', training:'Loop 1 km in je beste tijd!', duration:'10-15 min', note:'Test jezelf — schrijf je tijd op!', intervals:[{type:'walk',sec:60},{type:'run',sec:600}] },
+    { day:'Zondag',    type:'rest',     emoji:'😴', training:'RUSTDAG', duration:'—', note:'Rust is ook training!' },
+  ]},
+  { title:'Week 2', name:'Ritme opbouwen', days:[
+    { day:'Maandag',   type:'run',      emoji:'🏃', training:'2 min lopen / 1 min wandelen × 5', duration:'20 min', note:'Langere loopblokken — goed bezig!', intervals:buildIntervals(120,60,5) },
+    { day:'Dinsdag',   type:'run',      emoji:'🏃', training:'2 min lopen / 1 min wandelen × 5', duration:'20 min', note:'Focus op ademhaling', intervals:buildIntervals(120,60,5) },
+    { day:'Woensdag',  type:'run',      emoji:'🏃', training:'20 min outdoor cardio (1 min wandelen, 3 min lopen × 5)', duration:'20 min', note:'Buiten! Meer lopen dan wandelen', intervals:buildIntervals(180,60,5) },
+    { day:'Donderdag', type:'run',      emoji:'🏃', training:'2 min lopen / 1 min wandelen × 5', duration:'20 min', note:'Je voelt al een verschil!', intervals:buildIntervals(120,60,5) },
+    { day:'Vrijdag',   type:'run',      emoji:'🏃', training:'2 min lopen / 1 min wandelen × 5', duration:'20 min', note:'Eindig sterk!', intervals:buildIntervals(120,60,5) },
+    { day:'Zaterdag',  type:'run',      emoji:'🏁', training:'Loop 2 km in je beste tijd!', duration:'15-20 min', note:'Vergelijk met vorige week!', intervals:[{type:'walk',sec:60},{type:'run',sec:1200}] },
+    { day:'Zondag',    type:'rest',     emoji:'😴', training:'RUSTDAG', duration:'—', note:'Rust verdient!' },
+  ]},
+  { title:'Week 3', name:'Uithouding testen', days:[
+    { day:'Maandag',   type:'run',      emoji:'🏃', training:'3 min lopen / 1 min wandelen × 4', duration:'20 min', note:'3 minuten aan één stuk — je kunt het!', intervals:buildIntervals(180,60,4) },
+    { day:'Dinsdag',   type:'run',      emoji:'🏃', training:'3 min lopen / 1 min wandelen × 4', duration:'20 min', note:'Rustig tempo, consistent blijven', intervals:buildIntervals(180,60,4) },
+    { day:'Woensdag',  type:'run',      emoji:'🏃', training:'10 min non-stop lopen 🏃', duration:'10 min', note:'Eerste keer 10 min aan één stuk!', intervals:[{type:'walk',sec:120},{type:'run',sec:600}] },
+    { day:'Donderdag', type:'run',      emoji:'🏃', training:'3 min lopen / 1 min wandelen × 4', duration:'20 min', note:'Goed gevoel? Geef iets meer gas', intervals:buildIntervals(180,60,4) },
+    { day:'Vrijdag',   type:'run',      emoji:'🏃', training:'3 min lopen / 1 min wandelen × 4', duration:'20 min', note:'Laatste interval training', intervals:buildIntervals(180,60,4) },
+    { day:'Zaterdag',  type:'run',      emoji:'🏁', training:'Loop 3 km in je beste tijd!', duration:'20-30 min', note:'Schrijf je tijd op!', intervals:[{type:'walk',sec:60},{type:'run',sec:1800}] },
+    { day:'Zondag',    type:'rest',     emoji:'😴', training:'RUSTDAG', duration:'—', note:'Goed verdiend!' },
+  ]},
+  { title:'Week 4', name:'De finale — 15 min non-stop! 🌸', days:[
+    { day:'Maandag',   type:'run',      emoji:'🏃', training:'5 min lopen / 1 min wandelen × 3', duration:'20 min', note:'Laatste opwarming week', intervals:buildIntervals(300,60,3) },
+    { day:'Dinsdag',   type:'run',      emoji:'🏃', training:'5 min lopen / 1 min wandelen × 3', duration:'20 min', note:'Je bent er bijna!', intervals:buildIntervals(300,60,3) },
+    { day:'Woensdag',  type:'run',      emoji:'🏃', training:'15 min non-stop lopen 🔥', duration:'15 min', note:'Halverwege de week al 15 min!', intervals:[{type:'walk',sec:120},{type:'run',sec:900}] },
+    { day:'Donderdag', type:'run',      emoji:'🏃', training:'5 min lopen / 1 min wandelen × 3', duration:'20 min', note:'Spaar je voor zaterdag', intervals:buildIntervals(300,60,3) },
+    { day:'Vrijdag',   type:'run',      emoji:'🏃', training:'5 min lopen / 1 min wandelen × 3', duration:'20 min', note:'Laatste training voor de finale!', intervals:buildIntervals(300,60,3) },
+    { day:'Zaterdag',  type:'run',      emoji:'🌸', training:'Loop 4 km in je beste tijd! 🎉', duration:'25-40 min', note:'GEWELDIG! Je hebt het gehaald!', intervals:[{type:'walk',sec:60},{type:'run',sec:2400}] },
+    { day:'Zondag',    type:'rest',     emoji:'🥳', training:'FEESTDAG!', duration:'—', note:'Trots zijn mag — je hebt het voltooid!' },
+  ]},
+];
+
+PROGRAMS.intro.weeks_data = WEEKS_INTRO;
+const WEEKS_10KM = [
+  { title:'Week 1', name:'Basis opbouwen', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'5 min lopen / 1 min wandelen × 4', duration:'24 min', note:'Rustig tempo — je moet kunnen praten', intervals: buildIntervals(300,60,4) },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust of lichte wandeling', duration:'20 min', note:'Herstel is training!' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'5 min lopen / 1 min wandelen × 4', duration:'24 min', note:'Zelfde als maandag', intervals: buildIntervals(300,60,4) },
+    { day:'Weekend', type:'optional', emoji:'🚶', training:'Rustige wandeling', duration:'30 min', note:'Optioneel' },
+  ]},
+  { title:'Week 2', name:'Langere blokken', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'7 min lopen / 1 min wandelen × 4', duration:'32 min', note:'Focus op gelijkmatig tempo', intervals: buildIntervals(420,60,4) },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust of lichte wandeling', duration:'20 min', note:'' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'8 min lopen / 1 min wandelen × 3', duration:'27 min', note:'Drie grote blokken', intervals: buildIntervals(480,60,3) },
+    { day:'Weekend', type:'optional', emoji:'🚶', training:'Rustige wandeling', duration:'30 min', note:'Optioneel' },
+  ]},
+  { title:'Week 3', name:'Uithouding testen', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'10 min lopen / 1 min wandelen × 3', duration:'33 min', note:'10 minuten blokken — goed bezig!', intervals: buildIntervals(600,60,3) },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'Benen laten herstellen' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'12 min lopen / 1 min wandelen × 2', duration:'26 min', note:'Twee lange blokken', intervals: buildIntervals(720,60,2) },
+    { day:'Weekend', type:'optional', emoji:'🚶', training:'Wandeling', duration:'30 min', note:'Optioneel' },
+  ]},
+  { title:'Week 4', name:'Rustweek', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'8 min lopen / 1 min wandelen × 3', duration:'27 min', note:'Rustweek — minder volume, zelfde ritme', intervals: buildIntervals(480,60,3) },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'Herstel is cruciaal' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'10 min lopen / 1 min wandelen × 2', duration:'22 min', note:'Kort en fris eindigen', intervals: buildIntervals(600,60,2) },
+    { day:'Weekend', type:'optional', emoji:'🧘', training:'Yoga of wandeling', duration:'30 min', note:'Optioneel' },
+  ]},
+  { title:'Week 5', name:'Halverwege!', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'15 min lopen / 1 min wandelen × 2', duration:'32 min', note:'Kwart marathon tempo!', intervals: buildIntervals(900,60,2) },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust of wandeling', duration:'20 min', note:'' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'20 min non-stop lopen', duration:'20 min', note:'Je kunt dit al — bewezen!', intervals: [{type:'walk',sec:60},{type:'run',sec:1200}] },
+    { day:'Weekend', type:'optional', emoji:'🚶', training:'Rustige wandeling', duration:'30 min', note:'Optioneel' },
+  ]},
+  { title:'Week 6', name:'Richting de finish', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'25 min non-stop lopen', duration:'25 min', note:'Gelijkmatig tempo houden', intervals: [{type:'walk',sec:60},{type:'run',sec:1500}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'20 min lopen / 2 min wandelen / 10 min lopen', duration:'32 min', note:'Negatieve splits oefenen', intervals: [{type:'walk',sec:60},{type:'run',sec:1200},{type:'walk',sec:120},{type:'run',sec:600}] },
+    { day:'Weekend', type:'optional', emoji:'🚴', training:'Fietsen of wandelen', duration:'40 min', note:'Optioneel' },
+  ]},
+  { title:'Week 7', name:'Bijna 10km!', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'30 min non-stop lopen', duration:'30 min', note:'30 minuten = ca. 4-5 km. Geweldig!', intervals: [{type:'walk',sec:60},{type:'run',sec:1800}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust of lichte wandeling', duration:'20 min', note:'' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'35 min non-stop lopen', duration:'35 min', note:'Laatste grote training', intervals: [{type:'walk',sec:60},{type:'run',sec:2100}] },
+    { day:'Weekend', type:'optional', emoji:'🚶', training:'Rustige wandeling', duration:'30 min', note:'Optioneel' },
+  ]},
+  { title:'Week 8', name:'10KM! De grote dag 🏅', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'20 min rustig lopen', duration:'20 min', note:'Tapering — spaar je energie', intervals: [{type:'walk',sec:60},{type:'run',sec:1200}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'Laatste hersteldag — eet goed, slaap goed' },
+    { day:'Vrijdag', type:'run', emoji:'🏅', training:'10KM NON-STOP LOPEN! 🎉', duration:'55-70 min', note:'JE HEBT HET GEHAALD!', intervals: [{type:'walk',sec:120},{type:'run',sec:3600}] },
+    { day:'Weekend', type:'optional', emoji:'🥳', training:'Feestje!', duration:'—', note:'Trots zijn mag!' },
+  ]},
+];
+
+// HALF MARATHON — 12 weeks, 3 sessions/week
+const WEEKS_HALF = [
+  { title:'Week 1', name:'Basis herhalen', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'30 min rustig lopen', duration:'30 min', note:'Rustig — je bouwt een fundament', intervals: [{type:'walk',sec:120},{type:'run',sec:1800}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust of yoga', duration:'—', note:'Mobiliteit is belangrijk' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'35 min lopen', duration:'35 min', note:'Licht tempo', intervals: [{type:'walk',sec:120},{type:'run',sec:2100}] },
+    { day:'Weekend', type:'optional', emoji:'🚶', training:'Wandeling 45 min', duration:'45 min', note:'Optioneel actief herstel' },
+  ]},
+  { title:'Week 2', name:'Volume opbouwen', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'35 min lopen', duration:'35 min', note:'Iets meer dan vorige week', intervals: [{type:'walk',sec:120},{type:'run',sec:2100}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'40 min lopen', duration:'40 min', note:'Rustig en consistent', intervals: [{type:'walk',sec:120},{type:'run',sec:2400}] },
+    { day:'Weekend', type:'optional', emoji:'🚴', training:'Fietsen of wandelen', duration:'45 min', note:'Optioneel' },
+  ]},
+  { title:'Week 3', name:'Eerste lange duurloop', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'35 min lopen', duration:'35 min', note:'', intervals: [{type:'walk',sec:120},{type:'run',sec:2100}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'50 min lopen', duration:'50 min', note:'Eerste echte lange duurloop!', intervals: [{type:'walk',sec:120},{type:'run',sec:3000}] },
+    { day:'Weekend', type:'optional', emoji:'🚶', training:'Wandeling', duration:'45 min', note:'Optioneel' },
+  ]},
+  { title:'Week 4', name:'Rustweek 1', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'25 min lopen', duration:'25 min', note:'Rustweek — minder volume', intervals: [{type:'walk',sec:120},{type:'run',sec:1500}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'Herstel is training!' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'30 min lopen', duration:'30 min', note:'Fris en hersteld', intervals: [{type:'walk',sec:120},{type:'run',sec:1800}] },
+    { day:'Weekend', type:'optional', emoji:'🧘', training:'Yoga of lichte wandeling', duration:'30 min', note:'Optioneel' },
+  ]},
+  { title:'Week 5', name:'Halverwege het traject', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'40 min lopen', duration:'40 min', note:'Terug naar volume', intervals: [{type:'walk',sec:120},{type:'run',sec:2400}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'55 min lopen', duration:'55 min', note:'Bijna een uur lopen!', intervals: [{type:'walk',sec:120},{type:'run',sec:3300}] },
+    { day:'Weekend', type:'optional', emoji:'🚴', training:'Fietsen of wandelen', duration:'45 min', note:'Optioneel' },
+  ]},
+  { title:'Week 6', name:'Kracht opbouwen', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'45 min lopen', duration:'45 min', note:'', intervals: [{type:'walk',sec:120},{type:'run',sec:2700}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'60 min lopen', duration:'60 min', note:'EEN UUR! Geweldig! 🎉', intervals: [{type:'walk',sec:120},{type:'run',sec:3600}] },
+    { day:'Weekend', type:'optional', emoji:'🚶', training:'Wandeling', duration:'45 min', note:'Optioneel' },
+  ]},
+  { title:'Week 7', name:'Richting de finish', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'45 min lopen', duration:'45 min', note:'Steady tempo', intervals: [{type:'walk',sec:120},{type:'run',sec:2700}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'70 min lopen', duration:'70 min', note:'Langste training tot nu!', intervals: [{type:'walk',sec:120},{type:'run',sec:4200}] },
+    { day:'Weekend', type:'optional', emoji:'🚴', training:'Fietsen of wandelen', duration:'45 min', note:'Optioneel' },
+  ]},
+  { title:'Week 8', name:'Rustweek 2', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'30 min lopen', duration:'30 min', note:'Rustweek — herstel prioriteit', intervals: [{type:'walk',sec:120},{type:'run',sec:1800}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'Slaap en eet goed' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'35 min lopen', duration:'35 min', note:'Fris en energiek', intervals: [{type:'walk',sec:120},{type:'run',sec:2100}] },
+    { day:'Weekend', type:'optional', emoji:'🧘', training:'Yoga', duration:'30 min', note:'Optioneel' },
+  ]},
+  { title:'Week 9', name:'Piek volume', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'50 min lopen', duration:'50 min', note:'Terug op volle kracht', intervals: [{type:'walk',sec:120},{type:'run',sec:3000}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'80 min lopen', duration:'80 min', note:'Je piektraining! Bijna halve marathon afstand', intervals: [{type:'walk',sec:120},{type:'run',sec:4800}] },
+    { day:'Weekend', type:'optional', emoji:'🚴', training:'Fietsen of wandelen', duration:'45 min', note:'Optioneel' },
+  ]},
+  { title:'Week 10', name:'Volume afbouwen', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'45 min lopen', duration:'45 min', note:'Volume begint te dalen', intervals: [{type:'walk',sec:120},{type:'run',sec:2700}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'60 min lopen', duration:'60 min', note:'', intervals: [{type:'walk',sec:120},{type:'run',sec:3600}] },
+    { day:'Weekend', type:'optional', emoji:'🚶', training:'Wandeling', duration:'45 min', note:'Optioneel' },
+  ]},
+  { title:'Week 11', name:'Tapering', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'35 min lopen', duration:'35 min', note:'Tapering — spaar je energie voor de grote dag', intervals: [{type:'walk',sec:120},{type:'run',sec:2100}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'Benen opladen' },
+    { day:'Vrijdag', type:'run', emoji:'🏃', training:'25 min lopen', duration:'25 min', note:'Kort en fris', intervals: [{type:'walk',sec:120},{type:'run',sec:1500}] },
+    { day:'Weekend', type:'optional', emoji:'🧘', training:'Yoga of wandeling', duration:'30 min', note:'Optioneel' },
+  ]},
+  { title:'Week 12', name:'HALVE MARATHON! 🏆', days:[
+    { day:'Maandag', type:'run', emoji:'🏃', training:'20 min rustig lopen', duration:'20 min', note:'Laatste rustige training', intervals: [{type:'walk',sec:120},{type:'run',sec:1200}] },
+    { day:'Woensdag', type:'rest', emoji:'😴', training:'Rust', duration:'—', note:'Slaap goed, eet goed, drink water' },
+    { day:'Vrijdag', type:'run', emoji:'🏆', training:'21,1 KM HALVE MARATHON! 🎉', duration:'2-2,5 uur', note:'JE HEBT HET GEHAALD!', intervals: [{type:'walk',sec:180},{type:'run',sec:7200}] },
+    { day:'Weekend', type:'optional', emoji:'🥳', training:'Feestje! 🥂', duration:'—', note:'Trots zijn mag!' },
+  ]},
+];
+
+PROGRAMS.str.weeks_data  = WEEKS_STR;
+PROGRAMS.ten.weeks_data  = WEEKS_10KM;
+PROGRAMS.half.weeks_data = WEEKS_HALF;
+
+// ===================== STATE =====================
+let completedWorkouts = JSON.parse(localStorage.getItem('str_completed') || '[]');
+let currentWeekIdx = parseInt(localStorage.getItem('str_weekIdx') || '0');
+let currentDayIdx  = parseInt(localStorage.getItem('str_dayIdx')  || '0');
+let currentProgramId = localStorage.getItem('str_programId') || 'str';
+let currentDay = null;
+let WEEKS = PROGRAMS.str.weeks_data; // active weeks reference
+
+// Timer state
+let timerInterval = null;
+let timerRunning = false;
+let phaseIdx = 0;
+let phaseSecsLeft = 0;
+let totalSecsElapsed = 0;
+let runRoundsCompleted = 0;
+let totalRunRounds = 0;
+let phases = [];
+
+// ===================== SAVE/LOAD =====================
+function saveCompleted() {
+  localStorage.setItem('str_completed', JSON.stringify(completedWorkouts));
+  localStorage.setItem('str_weekIdx', currentWeekIdx);
+  localStorage.setItem('str_dayIdx',  currentDayIdx);
+  localStorage.setItem('str_programId', currentProgramId);
+}
+
+function savePosition() {
+  localStorage.setItem('str_weekIdx', currentWeekIdx);
+  localStorage.setItem('str_dayIdx',  currentDayIdx);
+  localStorage.setItem('str_programId', currentProgramId);
+  localStorage.setItem(`str_weekIdx_${currentProgramId}`, currentWeekIdx);
+  localStorage.setItem(`str_dayIdx_${currentProgramId}`,  currentDayIdx);
+}
+
+function getWorkoutKey(weekIdx, dayIdx) {
+  return `${currentProgramId}-${weekIdx}-${dayIdx}`;
+}
+
+function isCompleted(weekIdx, dayIdx) {
+  return completedWorkouts.includes(getWorkoutKey(weekIdx, dayIdx));
+}
+
+// ===================== PROGRAM SELECT =====================
+function selectProgram(id) {
+  const prog = PROGRAMS[id];
+  if (!prog) return;
+
+  // Check unlock: ten requires str complete, half requires ten complete
+  if (id === 'ten' || id === 'half' || id === 'str') {
+    // Alle programma's zijn vrij beschikbaar
+  }
+
+  currentProgramId = id;
+  WEEKS = prog.weeks_data;
+  currentWeekIdx = parseInt(localStorage.getItem(`str_weekIdx_${id}`) || '0');
+  currentDayIdx  = parseInt(localStorage.getItem(`str_dayIdx_${id}`)  || '0');
+
+  // Update home screen header
+  document.getElementById('home-eyebrow').textContent = prog.eyebrow;
+  document.getElementById('home-title').innerHTML = prog.heroTitle;
+  document.getElementById('home-sub').textContent = prog.heroSub.replace(/ 🏃|🏅|🏆/g,'');
+
+  savePosition();
+  renderHome();
+  showScreen('home');
+}
+
+function isProgramComplete(id) {
+  const prog = PROGRAMS[id];
+  if (!prog) return false;
+  const savedId = currentProgramId;
+  // Temporarily check completions for this program
+  const weeks = prog.weeks_data;
+  for (let wi = 0; wi < weeks.length; wi++) {
+    for (let di = 0; di < weeks[wi].days.length; di++) {
+      const day = weeks[wi].days[di];
+      if (day.type === 'run') {
+        const key = `${id}-${wi}-${di}`;
+        if (!completedWorkouts.includes(key)) return false;
+      }
+    }
+  }
+  return true;
+}
+
+function getProgramProgress(id) {
+  const prog = PROGRAMS[id];
+  if (!prog) return { done: 0, total: 0 };
+  const weeks = prog.weeks_data;
+  let done = 0, total = 0;
+  for (let wi = 0; wi < weeks.length; wi++) {
+    for (let di = 0; di < weeks[wi].days.length; di++) {
+      if (weeks[wi].days[di].type === 'run') {
+        total++;
+        if (completedWorkouts.includes(`${id}-${wi}-${di}`)) done++;
+      }
+    }
+  }
+  return { done, total };
+}
+
+function renderProgramSelect() {
+  const container = document.getElementById('prog-cards');
+  container.innerHTML = '';
+
+  const order = ['intro', 'str', 'ten', 'half'];
+  order.forEach(id => {
+    const prog = PROGRAMS[id];
+    const { done, total } = getProgramProgress(id);
+    const pct = total > 0 ? Math.round(done / total * 100) : 0;
+    const isActive = id === currentProgramId;
+    const isLocked = false; // Alle programma's vrij beschikbaar
+    const isDone = done === total && total > 0;
+
+    const colorMap = { intro: '#f5c842', str: 'var(--accent)', ten: 'var(--green)', half: '#7eb8f7' };
+
+    const card = document.createElement('div');
+    card.className = 'prog-card' + (isLocked ? ' locked' : '');
+    card.innerHTML = `
+      <div class="prog-card-banner ${id}">
+        <div class="prog-card-emoji">${prog.emoji}</div>
+        <div class="prog-card-title">${prog.title}</div>
+        <div class="prog-card-goal">${prog.goal}</div>
+        ${isActive ? '<div class="prog-active-badge">▶ Actief</div>' : ''}
+        ${isLocked ? '<div class="prog-lock-badge">🔒 Vergrendeld</div>' : ''}
+        ${isDone && !isActive ? '<div class="prog-active-badge" style="border-color:var(--green);color:var(--green);background:rgba(61,220,132,0.1)">✓ Voltooid</div>' : ''}
+      </div>
+      <div class="prog-card-meta">
+        <div class="prog-meta-item">
+          <div class="prog-meta-val">${prog.weeks}</div>
+          <div class="prog-meta-lbl">Weken</div>
+        </div>
+        <div class="prog-meta-item">
+          <div class="prog-meta-val">${total}</div>
+          <div class="prog-meta-lbl">Trainingen</div>
+        </div>
+        <div class="prog-meta-item">
+          <div class="prog-meta-val">${done}</div>
+          <div class="prog-meta-lbl">Voltooid</div>
+        </div>
+      </div>
+      ${done > 0 || isActive ? `
+      <div class="prog-card-progress">
+        <div class="prog-progress-bar">
+          <div class="prog-progress-fill ${id}" style="width:${pct}%"></div>
+        </div>
+        <div class="prog-progress-text">${pct}% voltooid · ${done} van ${total} trainingen</div>
+      </div>` : ''}
+    `;
+    if (!isLocked) card.onclick = () => selectProgram(id);
+
+    // Add reset button if program has progress
+    if (done > 0) {
+      const resetBtn = document.createElement('button');
+      resetBtn.className = 'prog-reset-btn';
+      resetBtn.textContent = '↺ Programma resetten';
+      resetBtn.onclick = (e) => resetProgram(id, e);
+      card.appendChild(resetBtn);
+    }
+    container.appendChild(card);
+  });
+}
+
+// ===================== SCREENS =====================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'program-select') renderProgramSelect();
+}
+
+// ===================== HOME =====================
+function renderHome() {
+  const totalWeeks = WEEKS.length;
+  // Progress dots
+  const dots = document.getElementById('prog-dots');
+  dots.innerHTML = '';
+  let totalDone = completedWorkouts.filter(k => k.startsWith(currentProgramId+'-')).length;
+  let currentW = 0;
+
+  for(let i=0;i<totalWeeks;i++){
+    const weekDone = WEEKS[i].days.filter((d,di) => isCompleted(i,di) && d.type==='run').length;
+    const weekTotal = WEEKS[i].days.filter(d=>d.type==='run').length;
+    const dot = document.createElement('div');
+    dot.className = 'prog-dot';
+    dot.textContent = i+1;
+    dot.onclick = () => openWeek(i);
+    if(weekDone === weekTotal) { dot.classList.add('done'); }
+    else if(weekDone > 0) { dot.classList.add('current'); currentW = i; }
+    else if(i === 0 && totalDone === 0) { dot.classList.add('current'); currentW = 0; }
+    dots.appendChild(dot);
+  }
+
+  document.getElementById('prog-text').innerHTML = `Week <strong>${currentW+1}</strong> van ${totalWeeks} · <strong>${totalDone}</strong> trainingen voltooid`;
+
+  // Week list
+  const list = document.getElementById('week-list');
+  list.innerHTML = '';
+  WEEKS.forEach((week, wi) => {
+    const runDays = week.days.filter(d=>d.type==='run');
+    const doneDays = runDays.filter((d,di) => {
+      const realDi = week.days.indexOf(d);
+      return isCompleted(wi, realDi);
+    });
+    const allDone = doneDays.length === runDays.length;
+    const anyDone = doneDays.length > 0;
+
+    const card = document.createElement('div');
+    card.className = 'week-card' + (allDone?' done-week':anyDone?' current-week':'');
+    card.innerHTML = `
+      <div class="week-card-inner">
+        <div class="week-num">${wi+1}</div>
+        <div class="week-info">
+          <div class="week-name">${week.title} — ${week.name}</div>
+          <div class="week-detail">${runDays.length} looptrainingen · ${doneDays.length}/${runDays.length} voltooid</div>
+        </div>
+        <div class="week-badge ${allDone?'badge-done':anyDone?'badge-current':'badge-locked'}">
+          ${allDone?'✓ Klaar':anyDone?'Bezig':'Start'}
+        </div>
+      </div>`;
+    card.onclick = () => openWeek(wi);
+    list.appendChild(card);
+  });
+}
+
+// ===================== WEEK DETAIL =====================
+function openWeek(wi) {
+  currentWeekIdx = wi;
+  savePosition();
+  const week = WEEKS[wi];
+  document.getElementById('wd-title').textContent = `${week.title}`;
+  document.getElementById('wd-sub').textContent = week.name;
+
+  const list = document.getElementById('day-list');
+  list.innerHTML = '';
+
+  week.days.forEach((day, di) => {
+    const done = isCompleted(wi, di);
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    const hasTimer = day.intervals && day.intervals.length > 0;
+
+    card.innerHTML = `
+      <div class="day-card-inner">
+        <div class="day-icon ${day.type}">${done?'✅':day.emoji}</div>
+        <div class="day-info">
+          <div class="day-name">${day.day}</div>
+          <div class="day-training">${day.training}</div>
+          <div class="day-meta">
+            <span class="day-tag duration">⏱ ${day.duration}</span>
+            ${day.note?`<span class="day-tag">${day.note}</span>`:''}
+            ${hasTimer?'<span class="day-tag" style="background:rgba(255,85,51,0.15);color:#ff5533;">▶ Timer</span>':''}
+          </div>
+        </div>
+      </div>`;
+
+    if(hasTimer) {
+      card.onclick = () => startWorkout(wi, di);
+    } else if(day.type === 'rest' || day.type === 'optional') {
+      card.onclick = () => markRestDay(wi, di, day);
+    }
+
+    list.appendChild(card);
+  });
+
+  // Start button for next run day
+  const nextRunDay = week.days.findIndex((d,di) => d.type==='run' && !isCompleted(wi,di));
+  if(nextRunDay !== -1) {
+    const btn = document.createElement('button');
+    btn.className = 'start-btn';
+    btn.textContent = `▶ START TRAINING — ${week.days[nextRunDay].day}`;
+    btn.onclick = () => startWorkout(wi, nextRunDay);
+    list.appendChild(btn);
+  }
+
+  showScreen('week-detail');
+}
+
+function markRestDay(wi, di, day) {
+  if(!isCompleted(wi, di)) {
+    const key = getWorkoutKey(wi, di);
+    completedWorkouts.push(key);
+    saveCompleted();
+    openWeek(wi);
+  }
+}
+
+// ===================== TIMER =====================
+function startWorkout(wi, di) {
+  currentWeekIdx = wi;
+  currentDayIdx = di;
+  savePosition();
+  currentDay = WEEKS[wi].days[di];
+  phases = currentDay.intervals;
+  phaseIdx = 0;
+  phaseSecsLeft = phases[0].sec;
+  totalSecsElapsed = 0;
+  runRoundsCompleted = 0;
+  totalRunRounds = phases.filter(p=>p.type==='run').length;
+  timerRunning = false;
+
+  document.getElementById('timer-week-info').innerHTML = `<strong>${WEEKS[wi].title}</strong> · ${currentDay.day}`;
+  updateTimerUI();
+  showScreen('timer-screen');
+}
+
+function updateTimerUI() {
+  const phase = phases[phaseIdx];
+  const isRun = phase.type === 'run';
+
+  const label = document.getElementById('phase-label');
+  const bigTimer = document.getElementById('big-timer');
+  const sub = document.getElementById('timer-sub');
+  const ring = document.getElementById('ring-prog');
+
+  label.textContent = isRun ? '🏃 LOPEN' : '🚶 WANDELEN';
+  label.className = `phase-label ${isRun?'run-phase':'walk-phase'}`;
+  bigTimer.className = `big-timer ${isRun?'run-phase':'walk-phase'}`;
+
+  const mins = Math.floor(phaseSecsLeft / 60);
+  const secs = phaseSecsLeft % 60;
+  if(mins > 0) {
+    bigTimer.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+    sub.textContent = 'minuten';
+  } else {
+    bigTimer.textContent = secs.toString().padStart(2,'0');
+    sub.textContent = 'seconden';
+  }
+
+  // Ring progress
+  const totalPhaseSec = phase.sec;
+  const progress = (totalPhaseSec - phaseSecsLeft) / totalPhaseSec;
+  const circumference = 628;
+  ring.style.strokeDashoffset = circumference * (1 - progress);
+  ring.style.stroke = isRun ? '#ff5533' : '#3ddc84';
+
+  // Interval info
+  const runsDone = phases.slice(0, phaseIdx).filter(p=>p.type==='run').length;
+  const currentRun = isRun ? runsDone + 1 : runsDone;
+  document.getElementById('interval-current').textContent = `Loopblok ${currentRun} van ${totalRunRounds}`;
+  document.getElementById('round-counter').textContent = isRun ? 'LOPEN 🏃' : 'WANDELEN 🚶';
+
+  const nextPhase = phases[phaseIdx + 1];
+  const nextEl = document.getElementById('interval-next');
+  if(nextPhase) {
+    nextEl.innerHTML = `Volgende: <span>${nextPhase.type==='run'?'lopen 🏃':'wandelen 🚶'}</span>`;
+  } else {
+    nextEl.innerHTML = `<span style="color:#3ddc84">Laatste fase! 💪</span>`;
+  }
+
+  document.getElementById('play-btn').textContent = timerRunning ? '⏸ PAUZE' : '▶ START';
+}
+
+let timerEndTime = null;
+
+function toggleTimer() {
+  try { _getAudioCtx().resume(); } catch(e) {}
+  if(timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    timerEndTime = null;
+    document.getElementById('play-btn').textContent = '▶ VERDER';
+  } else {
+    timerRunning = true;
+    timerEndTime = Date.now() + phaseSecsLeft * 1000;
+    document.getElementById('play-btn').textContent = '⏸ PAUZE';
+    timerInterval = setInterval(timerTick, 500);
+  }
+}
+
+function timerTick() {
+  const remaining = Math.round((timerEndTime - Date.now()) / 1000);
+  if(remaining <= 0) {
+    totalSecsElapsed += phaseSecsLeft;
+    phaseSecsLeft = 0;
+    phaseIdx++;
+    if(phaseIdx >= phases.length) {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerEndTime = null;
+      playBeep('finish');
+      showFinished();
+      return;
+    }
+    phaseSecsLeft = phases[phaseIdx].sec;
+    timerEndTime = Date.now() + phaseSecsLeft * 1000;
+    playBeep('phase');
+    if(navigator.vibrate) navigator.vibrate([200,100,200]);
+  } else {
+    const elapsed = phaseSecsLeft - remaining;
+    totalSecsElapsed += Math.max(elapsed, 0);
+    phaseSecsLeft = remaining;
+  }
+  updateTimerUI();
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && timerRunning && timerEndTime) {
+    const remaining = Math.round((timerEndTime - Date.now()) / 1000);
+    if (remaining <= 0) {
+      let leftover = Math.abs(remaining);
+      phaseIdx++;
+      while (phaseIdx < phases.length) {
+        if (leftover < phases[phaseIdx].sec) {
+          phaseSecsLeft = phases[phaseIdx].sec - leftover;
+          timerEndTime = Date.now() + phaseSecsLeft * 1000;
+          playBeep('phase');
+          break;
+        }
+        leftover -= phases[phaseIdx].sec;
+        phaseIdx++;
+      }
+      if (phaseIdx >= phases.length) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        timerEndTime = null;
+        playBeep('finish');
+        showFinished();
+        return;
+      }
+    } else {
+      phaseSecsLeft = remaining;
+    }
+    updateTimerUI();
+  }
+});
+
+function skipPhase() {
+  phaseIdx++;
+  if(phaseIdx >= phases.length) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    showFinished();
+    return;
+  }
+  phaseSecsLeft = phases[phaseIdx].sec;
+  updateTimerUI();
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  openWeek(currentWeekIdx);
+}
+
+function showFinished() {
+  const key = getWorkoutKey(currentWeekIdx, currentDayIdx);
+  if(!completedWorkouts.includes(key)) {
+    completedWorkouts.push(key);
+    saveCompleted();
+  }
+
+  const mins = Math.floor(totalSecsElapsed/60);
+  const runRounds = phases.filter(p=>p.type==='run').length;
+
+  const isIntroFinal = currentProgramId === 'intro' && currentWeekIdx === 3 && currentDayIdx === 5;
+  const isStr8Final  = currentProgramId === 'str'  && currentWeekIdx === 7 && currentDayIdx === 2;
+  const isTen8Final  = currentProgramId === 'ten'  && currentWeekIdx === 7 && currentDayIdx === 2;
+  const isHalf12Final= currentProgramId === 'half' && currentWeekIdx === 11 && currentDayIdx === 2;
+  const isBigFinish  = isIntroFinal || isStr8Final || isTen8Final || isHalf12Final;
+
+  document.getElementById('finish-emoji').textContent = isBigFinish ? '🏆' : '🎉';
+  document.getElementById('finish-title').textContent = isBigFinish ? 'GEWELDIG!' : 'GEDAAN!';
+
+  let finishMsg = 'Super goed gedaan! Elke training telt. Rust nu goed uit 💪';
+  if (isIntroFinal)  finishMsg = 'Je hebt het 4-weken instapprogramma voltooid! Klaar voor Start to Run? 🌸🎉';
+  if (isStr8Final)   finishMsg = 'Je hebt het gehaald! 20 minuten non-stop gelopen! 🥳';
+  if (isTen8Final)   finishMsg = 'ONGELOOFLIJK! Je hebt 10 kilometer gelopen! 🏅🥳';
+  if (isHalf12Final) finishMsg = 'JE HEBT EEN HALVE MARATHON GELOPEN! 21,1 km! 🏆🥳';
+  document.getElementById('finish-sub').textContent = finishMsg;
+
+  document.getElementById('stat-time').textContent = mins;
+  document.getElementById('stat-rounds').textContent = runRounds;
+  document.getElementById('stat-week').textContent = `W${currentWeekIdx+1}`;
+
+  showScreen('finished');
+}
+
+function finishWorkout() {
+  renderHome();
+  openWeek(currentWeekIdx);
+}
+
+
+// ── AUDIO (Web Audio API) ──
+let _audioCtx = null;
+function _getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _audioCtx;
+}
+function playBeep(type) {
+  try {
+    const ctx = _getAudioCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+    const configs = {
+      phase:  [{ freq:523,start:0,dur:.15},{freq:659,start:.18,dur:.15},{freq:784,start:.36,dur:.30}],
+      finish: [{ freq:523,start:0,dur:.12},{freq:659,start:.15,dur:.12},{freq:784,start:.30,dur:.12},{freq:1047,start:.45,dur:.40}],
+      beep:   [{ freq:880,start:0,dur:.20}],
+    };
+    const now = ctx.currentTime;
+    (configs[type]||configs.beep).forEach(({freq,start,dur})=>{
+      const osc=ctx.createOscillator(), gain=ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type='sine'; osc.frequency.setValueAtTime(freq,now+start);
+      gain.gain.setValueAtTime(.4,now+start);
+      gain.gain.exponentialRampToValueAtTime(.001,now+start+dur);
+      osc.start(now+start); osc.stop(now+start+dur+.05);
+    });
+  } catch(e){ console.warn('Audio:',e); }
+}
+
+// ===================== VRIJE LOOP =====================
+let frMode = 'time';       // 'time' of 'dist'
+let frValue = null;        // geselecteerde waarde (minuten of km)
+let frLabel = '';          // display label
+let frTimerInterval = null;
+let frTimerRunning = false;
+let frSecsElapsed = 0;
+let frTargetSecs = 0;      // voor tijdmodus: doeltijd in seconden
+
+function selectFrMode(mode) {
+  frMode = mode;
+  frValue = null;
+  frLabel = '';
+  document.getElementById('fr-start-btn').disabled = true;
+  document.getElementById('fr-start-btn').textContent = 'KIES EEN OPTIE OM TE STARTEN';
+
+  // Toggle sectie zichtbaarheid
+  document.getElementById('fr-time-options').style.display = mode === 'time' ? 'block' : 'none';
+  document.getElementById('fr-dist-options').style.display = mode === 'dist' ? 'block' : 'none';
+
+  // Update knop stijl
+  const timeBtn = document.getElementById('fr-mode-time');
+  const distBtn = document.getElementById('fr-mode-dist');
+  if (mode === 'time') {
+    timeBtn.style.borderColor = '#f5c842'; timeBtn.style.background = 'rgba(245,200,66,0.12)'; timeBtn.style.color = '#f5c842';
+    distBtn.style.borderColor = 'var(--border)'; distBtn.style.background = 'var(--card)'; distBtn.style.color = 'var(--muted)';
+  } else {
+    distBtn.style.borderColor = '#f5c842'; distBtn.style.background = 'rgba(245,200,66,0.12)'; distBtn.style.color = '#f5c842';
+    timeBtn.style.borderColor = 'var(--border)'; timeBtn.style.background = 'var(--card)'; timeBtn.style.color = 'var(--muted)';
+  }
+
+  // Deselect all options
+  document.querySelectorAll('.fr-option').forEach(el => el.classList.remove('selected'));
+}
+
+function selectFrOption(mode, value, label) {
+  frMode = mode;
+  frValue = value;
+  frLabel = label;
+
+  // Highlight geselecteerde optie
+  document.querySelectorAll('.fr-option').forEach(el => el.classList.remove('selected'));
+  const id = mode === 'time' ? `fro-${value}` : `fro-${value}km`;
+  const el = document.getElementById(id);
+  if (el) el.classList.add('selected');
+
+  // Enable start knop
+  const btn = document.getElementById('fr-start-btn');
+  btn.disabled = false;
+  btn.textContent = `▶ START — ${label}`;
+}
+
+function startFreeRun() {
+  if (!frValue) return;
+  frSecsElapsed = 0;
+  frTimerRunning = false;
+  clearInterval(frTimerInterval);
+
+  // Stel timer in
+  frTargetSecs = frMode === 'time' ? frValue * 60 : 0; // 0 = geen limiet voor afstand
+
+  // Update timer scherm
+  document.getElementById('fr-timer-label').textContent = `VRIJE LOOP — ${frLabel}`;
+  document.getElementById('fr-phase-label').textContent = 'LOOP! 💪';
+  document.getElementById('fr-big-timer').textContent = '00:00';
+  document.getElementById('fr-timer-sub').textContent = 'verstreken';
+  document.getElementById('fr-play-btn').textContent = '▶ START';
+  document.getElementById('fr-target-label').textContent = frMode === 'time'
+    ? `DOEL: ${frLabel}`
+    : `DOEL: ${frLabel} — druk STOP als je klaar bent`;
+
+  // Ring reset
+  const ring = document.getElementById('fr-ring-prog');
+  ring.style.strokeDashoffset = '0';
+
+  showScreen('free-run-timer');
+}
+
+function toggleFreeRunTimer() {
+  if (frTimerRunning) {
+    clearInterval(frTimerInterval);
+    frTimerRunning = false;
+    document.getElementById('fr-play-btn').textContent = '▶ Verder';
+    document.getElementById('fr-phase-label').textContent = 'GEPAUZEERD';
+  } else {
+    frTimerRunning = true;
+    document.getElementById('fr-play-btn').textContent = '⏸ Pauzeer';
+    document.getElementById('fr-phase-label').textContent = 'LOOP! 💪';
+    let frEndTime = frMode === 'time' ? Date.now() + (frTargetSecs - frSecsElapsed) * 1000 : null;
+    frTimerInterval = setInterval(() => {
+      if (frMode === 'time' && frEndTime) {
+        const remaining = Math.round((frEndTime - Date.now()) / 1000);
+        frSecsElapsed = frTargetSecs - remaining;
+        if (remaining <= 0) {
+          frSecsElapsed = frTargetSecs;
+          updateFreeRunUI();
+          clearInterval(frTimerInterval);
+          frTimerRunning = false;
+          playBeep('finish');
+          showFreeRunDone();
+          return;
+        }
+      } else {
+        frSecsElapsed++;
+      }
+      updateFreeRunUI();
+    }, 500);
+  }
+}
+
+function updateFreeRunUI() {
+  const mins = Math.floor(frSecsElapsed / 60);
+  const secs = frSecsElapsed % 60;
+  document.getElementById('fr-big-timer').textContent =
+    String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+
+  // Ring animatie
+  const ring = document.getElementById('fr-ring-prog');
+  if (frMode === 'time' && frTargetSecs > 0) {
+    const pct = Math.min(frSecsElapsed / frTargetSecs, 1);
+    ring.style.strokeDashoffset = String(628 - pct * 628);
+  } else {
+    // Voor afstand: ring tikt mee op basis van verwachte tijd
+    const estSecs = frValue * 6 * 60; // ~6 min/km schatting
+    const pct = Math.min(frSecsElapsed / estSecs, 1);
+    ring.style.strokeDashoffset = String(628 - pct * 628);
+  }
+
+  // Label update
+  if (frMode === 'time') {
+    const remaining = frTargetSecs - frSecsElapsed;
+    const rm = Math.floor(remaining / 60);
+    const rs = remaining % 60;
+    document.getElementById('fr-interval-info').textContent =
+      remaining > 0 ? `Nog ${rm}:${String(rs).padStart(2,'0')} te gaan 💪` : 'Klaar! 🎉';
+  } else {
+    const estPace = 6; // min/km
+    const estKm = (frSecsElapsed / 60 / estPace).toFixed(1);
+    document.getElementById('fr-interval-info').textContent = `~${estKm} km afgelegd 🏃`;
+  }
+}
+
+function stopFreeRun() {
+  clearInterval(frTimerInterval);
+  frTimerRunning = false;
+  showFreeRunDone();
+}
+
+function showFreeRunDone() {
+  const mins = Math.floor(frSecsElapsed / 60);
+  const secs = frSecsElapsed % 60;
+  const timeStr = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+
+  document.getElementById('fr-stat-time').textContent = timeStr;
+
+  if (frMode === 'time') {
+    document.getElementById('fr-stat-target').textContent = frLabel;
+    document.getElementById('fr-stat-lbl').textContent = 'doel bereikt';
+    document.getElementById('fr-done-sub').textContent = `${frLabel} non-stop gelopen! Geweldig! 🎉`;
+  } else {
+    const estPace = 6;
+    const estKm = (frSecsElapsed / 60 / estPace).toFixed(1);
+    document.getElementById('fr-stat-target').textContent = frLabel;
+    document.getElementById('fr-stat-lbl').textContent = 'afstand';
+    document.getElementById('fr-done-sub').textContent = `${frLabel} gelopen in ${timeStr}! Fantastisch! 🏅`;
+  }
+  showScreen('free-run-done');
+}
+
+// ===================== INIT =====================
+// Load correct program
+WEEKS = PROGRAMS[currentProgramId].weeks_data;
+const prog = PROGRAMS[currentProgramId];
+document.getElementById('home-eyebrow').textContent = prog.eyebrow;
+document.getElementById('home-title').innerHTML = prog.heroTitle;
+document.getElementById('home-sub').textContent = prog.heroSub.replace(/ 🏃|🏅|🏆/g,'');
+
+renderProgramSelect();
+renderHome();
+// Show program select on first load, home if already in a program
+if (localStorage.getItem('str_programId')) {
+  showScreen('program-select');
+} else {
+  showScreen('program-select');
+}
+
+// ── TOEGANGSCODES START TO RUN ──
+const STR_VALID_CODES = [
+  'STR-DEMO-2026',     // Demo code voor testen
+  'STR-TEST-2026',     // Test code
+  // Voeg hier nieuwe klantcodes toe:
+  // 'STR-NAAM-2026',
+];
+
+function checkSTRCode() {
+  const input = document.getElementById('strAccessInput').value.trim().toUpperCase();
+  const errorEl = document.getElementById('strAccessError');
+  if (STR_VALID_CODES.includes(input)) {
+    localStorage.setItem('str_access', input);
+    document.getElementById('accessOverlay').classList.add('hidden');
+    errorEl.style.display = 'none';
+  } else {
+    errorEl.style.display = 'block';
+    document.getElementById('strAccessInput').style.borderColor = '#ff5533';
+    setTimeout(() => { document.getElementById('strAccessInput').style.borderColor = ''; }, 2000);
+  }
+}
+
+// ── PWA INSTALL ──
+let strDeferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  strDeferredPrompt = e;
+  document.getElementById('strPwaBanner').style.display = 'block';
+});
+function installSTRPWA() {
+  if (strDeferredPrompt) {
+    strDeferredPrompt.prompt();
+    strDeferredPrompt.userChoice.then(() => {
+      strDeferredPrompt = null;
+      document.getElementById('strPwaBanner').style.display = 'none';
+    });
+  }
+}
+
+// ── ACCESS CHECK ON LOAD ──
+window.addEventListener('DOMContentLoaded', function() {
+  const saved = localStorage.getItem('str_access');
+  if (!saved || !STR_VALID_CODES.includes(saved)) {
+    document.getElementById('accessOverlay').classList.remove('hidden');
+  }
+});
+
+
+function resetProgram(id, event) {
+  event.stopPropagation(); // Don't open the program
+  const prog = PROGRAMS[id];
+  if (!prog) return;
+  if (!confirm('Wil je ' + prog.title + ' volledig resetten? Al je voortgang wordt gewist.')) return;
+
+  // Remove all completed workouts for this program
+  completedWorkouts = completedWorkouts.filter(key => !key.startsWith(id + '_'));
+  localStorage.setItem('str_completed', JSON.stringify(completedWorkouts));
+
+  // Reset week and day for this program
+  localStorage.removeItem('str_weekIdx_' + id);
+  localStorage.removeItem('str_dayIdx_' + id);
+
+  // If this is the active program, reset current state too
+  if (currentProgramId === id) {
+    currentWeekIdx = 0;
+    currentDayIdx = 0;
+    localStorage.setItem('str_weekIdx', '0');
+    localStorage.setItem('str_dayIdx', '0');
+  }
+
+  renderProgramSelect();
+  showToast(prog.title + ' gereset! Veel succes! 💪');
+}
+
+function showToast(msg) {
+  let t = document.getElementById('str-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'str-toast';
+    t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#ff5533;color:white;padding:12px 24px;border-radius:50px;font-size:12px;letter-spacing:1px;text-transform:uppercase;transition:transform .4s;z-index:999;white-space:nowrap;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(80px)'; }, 3000);
+}
+
+</script>
+</body>
+</html>

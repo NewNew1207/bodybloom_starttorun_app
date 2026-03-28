@@ -1,0 +1,17 @@
+{
+  "name": "Body Bloom 12·3·30 Challenge",
+  "short_name": "12·3·30",
+  "description": "30 Dagen Loopband Challenge by Body Bloom",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fdf6f0",
+  "theme_color": "#C25C76",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%23C25C76'/><text y='.9em' font-size='150' x='20'>🌸</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
