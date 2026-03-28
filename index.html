@@ -2513,7 +2513,7 @@ function resetProgram(id, event) {
   if (!confirm('Wil je ' + prog.title + ' volledig resetten? Al je voortgang wordt gewist.')) return;
 
   // Remove all completed workouts for this program
-  completedWorkouts = completedWorkouts.filter(key => !key.startsWith(id + '_'));
+  completedWorkouts = completedWorkouts.filter(key => !key.startsWith(id + '-'));
   localStorage.setItem('str_completed', JSON.stringify(completedWorkouts));
 
   // Reset week and day for this program
