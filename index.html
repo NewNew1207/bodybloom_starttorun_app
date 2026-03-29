@@ -1095,6 +1095,83 @@
   <button onclick="document.getElementById('strPwaBanner').style.display='none'" style="background:transparent;border:none;color:rgba(255,255,255,.7);cursor:pointer;margin-left:6px;font-size:16px;">x</button>
 </div>
 
+<!-- WELKOMSTSCHERM OVERLAY -->
+<div class="access-overlay hidden" id="welcomeOverlay" style="z-index:9998;">
+  <div class="access-box" style="text-align:center;border-color:#3ddc84;">
+    <div style="font-size:56px;margin-bottom:16px;">🌸</div>
+    <div class="access-logo" style="color:#3ddc84;">Body Bloom Running</div>
+    <div class="access-title">WELKOM</div>
+    <div id="welcomeName" style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:#ff5533;margin-bottom:16px;line-height:1;">SOFIA</div>
+    <div style="font-size:14px;color:#aaa;line-height:1.7;margin-bottom:28px;font-style:italic;">
+      "Pijn is tijdelijk,<br><strong style="color:#f0f2f7;">trots is voor altijd.</strong>" 💪
+    </div>
+    <button class="access-btn" onclick="closeWelcome()" style="background:#3ddc84;color:#0d0f14;">START MIJN PROGRAMMA 🏃‍♀️</button>
+  </div>
+</div>
+
+<!-- DISCLAIMER SCREEN -->
+<div class="screen" id="disclaimer-screen">
+  <div class="week-header">
+    <div class="back-btn" id="disclaimer-back-btn" onclick="showScreen('program-select')">← Terug</div>
+    <div class="week-detail-title">DISCLAIMER</div>
+    <div class="week-detail-sub">Gebruiksvoorwaarden Body•Bloom</div>
+  </div>
+  <div style="padding:20px;display:flex;flex-direction:column;gap:14px;padding-bottom:60px;overflow-y:auto;">
+    <div class="tip-card">
+      <div class="tip-title">⚕️ Medisch advies</div>
+      <div class="tip-text">Dit loopprogramma is uitsluitend bedoeld voor informatieve en educatieve doeleinden. De inhoud vervangt geen medisch advies, diagnose of behandeling van een gekwalificeerde arts of zorgverlener. Raadpleeg altijd een arts voordat je begint met een nieuw sportprogramma.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">⚠️ Gebruik op eigen risico</div>
+      <div class="tip-text">De deelname aan dit programma gebeurt volledig op eigen risico. Body•Bloom en Sofia la Bianca zijn niet aansprakelijk voor letsel, schade of gezondheidsproblemen die kunnen voortvloeien uit het gebruik van dit programma. Stop onmiddellijk bij pijn, duizeligheid of kortademigheid.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">🏃 Persoonlijke limieten</div>
+      <div class="tip-text">Luister altijd naar je lichaam. Dit programma is een algemene richtlijn. Individuele resultaten variëren afhankelijk van leeftijd, conditie en gezondheid. Herhaal een week indien nodig en forceer nooit.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">©️ Intellectuele eigendom</div>
+      <div class="tip-text">Alle inhoud van deze app — programma, teksten, ontwerp en structuur — zijn eigendom van Sofia la Bianca / Body•Bloom. © 2026 Sofia la Bianca · Body•Bloom. Alle rechten voorbehouden. Kopiëren of commercieel gebruik zonder schriftelijke toestemming is niet toegestaan.</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">📩 Contact</div>
+      <div class="tip-text">Vragen of opmerkingen? Neem contact op via je Body•Bloom coach of via Instagram @body_bloom_be.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MIJN DATA SCREEN -->
+<div class="screen" id="mydata-screen">
+  <div class="week-header">
+    <div class="back-btn" id="mydata-back-btn" onclick="showScreen(mydataPrevScreen || 'program-select')">← Terug</div>
+    <div class="week-detail-sub">Back-up & herstel van jouw voortgang</div>
+  </div>
+  <div style="padding:20px;display:flex;flex-direction:column;gap:14px;padding-bottom:80px;overflow-y:auto;">
+    <div class="tip-card">
+      <div class="tip-title">📊 Statistieken</div>
+      <div id="mydata-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:10px;">Laatste training: <span id="mydata-lastdate" style="color:var(--text);">—</span></div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">📤 Back-up exporteren</div>
+      <div class="tip-text" style="margin-bottom:12px;">Kopieer en bewaar je voortgang veilig (bv. in Notes). Zo verlies je nooit je data.</div>
+      <button onclick="mydataExport()" style="width:100%;background:var(--green);color:#0d0f14;border:none;border-radius:12px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;margin-bottom:8px;">EXPORTEER MIJN DATA</button>
+      <textarea id="mydata-export-box" readonly style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:monospace;font-size:10px;resize:vertical;min-height:80px;outline:none;" placeholder="Jouw back-up code verschijnt hier..."></textarea>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">📥 Back-up importeren</div>
+      <div class="tip-text" style="margin-bottom:12px;">Plak je eerder opgeslagen back-up om je voortgang te herstellen.</div>
+      <textarea id="mydata-import-box" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:monospace;font-size:10px;resize:vertical;min-height:80px;outline:none;margin-bottom:8px;" placeholder="Plak hier je back-up code..."></textarea>
+      <button onclick="mydataImport()" style="width:100%;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;">IMPORTEER BACK-UP</button>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">🗑️ Voortgang wissen</div>
+      <div class="tip-text" style="margin-bottom:12px;">Wil je helemaal opnieuw beginnen? Dit wist alle voltooide trainingen en kan niet ongedaan gemaakt worden.</div>
+      <button onclick="mydataReset()" style="width:100%;background:rgba(255,85,51,0.1);color:var(--accent);border:1px solid rgba(255,85,51,0.2);border-radius:12px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;cursor:pointer;">ALLES OPNIEUW BEGINNEN</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOEGANGSCODE MODAL -->
 <div class="access-overlay hidden" id="accessOverlay">
   <div class="access-box">
@@ -1102,13 +1179,13 @@
     <div class="access-title">START TO RUN</div>
     <div class="access-sub">Voer jouw persoonlijke toegangscode in</div>
     <input type="text" class="access-input" id="strAccessInput"
-      placeholder="Jouw code (bv. STR-LISA-2026)"
+      placeholder="Jouw toegangscode"
       maxlength="20"
       oninput="this.value=this.value.toUpperCase()"
       onkeydown="if(event.key==='Enter')checkSTRCode()">
     <button class="access-btn" onclick="checkSTRCode()">TOEGANG KRIJGEN</button>
     <div class="access-error" id="strAccessError">Ongeldige code. Probeer opnieuw.</div>
-    <div class="access-link">Nog geen code? Koop de app via Instagram DM voor slechts &euro;9,99</div>
+    <div class="access-link">Exclusief voor Body•Bloom klanten · <a onclick="document.getElementById('accessOverlay').classList.add('hidden');document.getElementById('disclaimer-back-btn').onclick=()=>{document.getElementById('disclaimer-screen').classList.remove('active');document.getElementById('accessOverlay').classList.remove('hidden');};showScreen('disclaimer-screen');" style="cursor:pointer;">Disclaimer</a></div>
   </div>
 </div>
 
@@ -1142,7 +1219,17 @@
 
   <nav class="bottom-nav">
     <div style="width:100%;">
-      <div class="copyright">© 2026 <span>Sofia la Bianca</span> · Body•Bloom</div>
+      <div class="copyright">© 2026 <span>Sofia la Bianca</span> · Body•Bloom · <span onclick="showScreen('disclaimer-screen');document.getElementById('disclaimer-back-btn').onclick=()=>showScreen('program-select');" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Disclaimer</span></div>
+      <div style="display:flex;">
+        <div class="nav-item active" onclick="showScreen('program-select')">
+          <div class="nav-icon">🏠</div>
+          <div class="nav-label">PROGRAMMA'S</div>
+        </div>
+        <div class="nav-item" onclick="showMydataScreen('program-select')">
+          <div class="nav-icon">💾</div>
+          <div class="nav-label">MIJN DATA</div>
+        </div>
+      </div>
     </div>
   </nav>
 </div>
@@ -1291,7 +1378,7 @@
 
   <nav class="bottom-nav">
     <div style="width:100%;">
-      <div class="copyright">© 2026 <span>Sofia la Bianca</span> · Body•Bloom</div>
+      <div class="copyright">© 2026 <span>Sofia la Bianca</span> · Body•Bloom · <span onclick="showScreen('disclaimer-screen');document.getElementById('disclaimer-back-btn').onclick=()=>showScreen('home');" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Disclaimer</span></div>
       <div style="display:flex;">
         <div class="nav-item" onclick="showScreen('program-select')">
           <div class="nav-icon">🏠</div>
@@ -1304,6 +1391,10 @@
         <div class="nav-item" onclick="showScreen('tips-screen')">
           <div class="nav-icon">💡</div>
           <div class="nav-label">TIPS</div>
+        </div>
+        <div class="nav-item" onclick="showMydataScreen('home')">
+          <div class="nav-icon">💾</div>
+          <div class="nav-label">MIJN DATA</div>
         </div>
       </div>
     </div>
@@ -1421,7 +1512,7 @@
   </div>
   <nav class="bottom-nav">
     <div style="width:100%;">
-      <div class="copyright">© 2026 <span>Sofia la Bianca</span> · Body•Bloom</div>
+      <div class="copyright">© 2026 <span>Sofia la Bianca</span> · Body•Bloom · <span onclick="showScreen('disclaimer-screen');document.getElementById('disclaimer-back-btn').onclick=()=>showScreen('tips-screen');" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Disclaimer</span></div>
       <div style="display:flex;">
         <div class="nav-item" onclick="showScreen('program-select')">
           <div class="nav-icon">🏠</div>
@@ -1434,6 +1525,10 @@
         <div class="nav-item active" onclick="showScreen('tips-screen')">
           <div class="nav-icon">💡</div>
           <div class="nav-label">TIPS</div>
+        </div>
+        <div class="nav-item" onclick="showMydataScreen('tips-screen')">
+          <div class="nav-icon">💾</div>
+          <div class="nav-label">MIJN DATA</div>
         </div>
       </div>
     </div>
@@ -1781,8 +1876,11 @@ let totalRunRounds = 0;
 let phases = [];
 
 // ===================== SAVE/LOAD =====================
+let completedDates = JSON.parse(localStorage.getItem('str_completed_dates') || '{}');
+
 function saveCompleted() {
   localStorage.setItem('str_completed', JSON.stringify(completedWorkouts));
+  localStorage.setItem('str_completed_dates', JSON.stringify(completedDates));
   localStorage.setItem('str_weekIdx', currentWeekIdx);
   localStorage.setItem('str_dayIdx',  currentDayIdx);
   localStorage.setItem('str_programId', currentProgramId);
@@ -2007,7 +2105,7 @@ function openWeek(wi) {
       <div class="day-card-inner">
         <div class="day-icon ${day.type}">${done?'✅':day.emoji}</div>
         <div class="day-info">
-          <div class="day-name">${day.day}</div>
+          <div class="day-name">${day.day}${done && completedDates[getWorkoutKey(wi,di)] ? ` <span style="font-size:10px;color:var(--green);font-weight:400;">· ${completedDates[getWorkoutKey(wi,di)]}</span>` : ''}</div>
           <div class="day-training">${day.training}</div>
           <div class="day-meta">
             <span class="day-tag duration">⏱ ${day.duration}</span>
@@ -2043,6 +2141,7 @@ function markRestDay(wi, di, day) {
   if(!isCompleted(wi, di)) {
     const key = getWorkoutKey(wi, di);
     completedWorkouts.push(key);
+    completedDates[key] = new Date().toLocaleDateString('nl-BE');
     saveCompleted();
     openWeek(wi);
   }
@@ -2210,6 +2309,7 @@ function showFinished() {
   const key = getWorkoutKey(currentWeekIdx, currentDayIdx);
   if(!completedWorkouts.includes(key)) {
     completedWorkouts.push(key);
+    completedDates[key] = new Date().toLocaleDateString('nl-BE');
     saveCompleted();
   }
 
@@ -2441,6 +2541,101 @@ function showFreeRunDone() {
   showScreen('free-run-done');
 }
 
+// ===================== MIJN DATA =====================
+let mydataPrevScreen = 'program-select';
+
+function showMydataScreen(from) {
+  mydataPrevScreen = from || 'program-select';
+  document.getElementById('mydata-back-btn') && (document.getElementById('mydata-back-btn').onclick = () => showScreen(mydataPrevScreen));
+  renderMydataStats();
+  showScreen('mydata-screen');
+}
+
+function renderMydataStats() {
+  const total = completedWorkouts.length;
+  const runKeys = completedWorkouts.filter(k => {
+    const parts = k.split('-');
+    if (parts.length < 3) return false;
+    const progId = parts[0];
+    const wi = parseInt(parts[1]);
+    const di = parseInt(parts[2]);
+    const prog = PROGRAMS[progId];
+    if (!prog || !prog.weeks_data) return false;
+    const week = prog.weeks_data[wi];
+    if (!week) return false;
+    const day = week.days[di];
+    return day && day.type === 'run';
+  }).length;
+  const weeksStarted = new Set(completedWorkouts.map(k => k.split('-').slice(0,2).join('-'))).size;
+
+  const dates = Object.values(completedDates);
+  const lastDate = dates.length > 0 ? dates[dates.length - 1] : '—';
+
+  document.getElementById('mydata-stats').innerHTML = `
+    <div style="background:var(--surface);border-radius:12px;padding:12px 8px;text-align:center;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);">${total}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px;">Voltooid</div>
+    </div>
+    <div style="background:var(--surface);border-radius:12px;padding:12px 8px;text-align:center;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);">${runKeys}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px;">Looprond.</div>
+    </div>
+    <div style="background:var(--surface);border-radius:12px;padding:12px 8px;text-align:center;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);">${weeksStarted}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px;">Weken</div>
+    </div>
+  `;
+  document.getElementById('mydata-lastdate').textContent = lastDate;
+}
+
+function mydataExport() {
+  const payload = {
+    completedWorkouts,
+    completedDates,
+    exportedAt: new Date().toISOString(),
+    version: 2,
+    app: 'BB-Running'
+  };
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  document.getElementById('mydata-export-box').value = encoded;
+  try { navigator.clipboard.writeText(encoded); } catch(e) {}
+  showToast('✅ Back-up gekopieerd naar klembord!');
+}
+
+function mydataImport() {
+  const raw = document.getElementById('mydata-import-box').value.trim();
+  if (!raw) { showToast('Plak eerst je back-up code.'); return; }
+  try {
+    const decoded = JSON.parse(decodeURIComponent(escape(atob(raw))));
+    if (!decoded.completedWorkouts) throw new Error();
+    completedWorkouts = decoded.completedWorkouts;
+    completedDates = decoded.completedDates || {};
+    saveCompleted();
+    localStorage.setItem('str_completed_dates', JSON.stringify(completedDates));
+    renderMydataStats();
+    renderHome();
+    renderProgramSelect();
+    document.getElementById('mydata-import-box').value = '';
+    showToast('✅ Back-up succesvol hersteld!');
+  } catch(e) {
+    showToast('❌ Ongeldige back-up code. Controleer of de code volledig is.');
+  }
+}
+
+function mydataReset() {
+  if (!confirm('Wil je ALLE voortgang wissen van alle programma\'s? Dit kan niet ongedaan gemaakt worden.')) return;
+  completedWorkouts = [];
+  completedDates = {};
+  saveCompleted();
+  localStorage.setItem('str_completed_dates', JSON.stringify(completedDates));
+  currentWeekIdx = 0;
+  currentDayIdx = 0;
+  renderMydataStats();
+  renderHome();
+  renderProgramSelect();
+  showToast('✅ Voortgang gewist. Veel succes! 💪');
+}
+
 // ===================== INIT =====================
 // Load correct program
 WEEKS = PROGRAMS[currentProgramId].weeks_data;
@@ -2458,26 +2653,38 @@ if (localStorage.getItem('str_programId')) {
   showScreen('program-select');
 }
 
-// ── TOEGANGSCODES START TO RUN ──
+// ── TOEGANGSCODES ──
 const STR_VALID_CODES = [
-  'STR-DEMO-2026',     // Demo code voor testen
-  'STR-TEST-2026',     // Test code
-  // Voeg hier nieuwe klantcodes toe:
-  // 'STR-NAAM-2026',
+  'BB-SOFIA-ADMIN',
+  // Voeg hier klantcodes toe:
+  // 'BB-CLIENT-001',
 ];
 
 function checkSTRCode() {
   const input = document.getElementById('strAccessInput').value.trim().toUpperCase();
   const errorEl = document.getElementById('strAccessError');
   if (STR_VALID_CODES.includes(input)) {
-    localStorage.setItem('str_access', input);
+    const expiry = Date.now() + (365 * 24 * 60 * 60 * 1000);
+    localStorage.setItem('str_access', JSON.stringify({ code: input, expiry }));
     document.getElementById('accessOverlay').classList.add('hidden');
     errorEl.style.display = 'none';
+    showWelcomeScreen(input);
   } else {
     errorEl.style.display = 'block';
     document.getElementById('strAccessInput').style.borderColor = '#ff5533';
     setTimeout(() => { document.getElementById('strAccessInput').style.borderColor = ''; }, 2000);
   }
+}
+
+function showWelcomeScreen(code) {
+  const isAdmin = code === 'BB-SOFIA-ADMIN';
+  const name = isAdmin ? 'SOFIA' : code.replace('BB-','').replace(/-\d+$/,'').replace(/-/g,' ');
+  document.getElementById('welcomeName').textContent = name;
+  document.getElementById('welcomeOverlay').classList.remove('hidden');
+}
+
+function closeWelcome() {
+  document.getElementById('welcomeOverlay').classList.add('hidden');
 }
 
 // ── PWA INSTALL ──
@@ -2499,10 +2706,16 @@ function installSTRPWA() {
 
 // ── ACCESS CHECK ON LOAD ──
 window.addEventListener('DOMContentLoaded', function() {
-  const saved = localStorage.getItem('str_access');
-  if (!saved || !STR_VALID_CODES.includes(saved)) {
-    document.getElementById('accessOverlay').classList.remove('hidden');
+  const raw = localStorage.getItem('str_access');
+  let valid = false;
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (STR_VALID_CODES.includes(parsed.code) && Date.now() < parsed.expiry) valid = true;
+      else localStorage.removeItem('str_access');
+    } catch(e) { localStorage.removeItem('str_access'); }
   }
+  if (!valid) document.getElementById('accessOverlay').classList.remove('hidden');
 });
 
 
@@ -2514,7 +2727,9 @@ function resetProgram(id, event) {
 
   // Remove all completed workouts for this program
   completedWorkouts = completedWorkouts.filter(key => !key.startsWith(id + '-'));
+  Object.keys(completedDates).forEach(k => { if (k.startsWith(id + '-')) delete completedDates[k]; });
   localStorage.setItem('str_completed', JSON.stringify(completedWorkouts));
+  localStorage.setItem('str_completed_dates', JSON.stringify(completedDates));
 
   // Reset week and day for this program
   localStorage.removeItem('str_weekIdx_' + id);
