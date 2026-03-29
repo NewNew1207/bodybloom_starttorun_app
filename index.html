@@ -1135,7 +1135,7 @@
     </div>
     <div class="tip-card">
       <div class="tip-title">📩 Contact</div>
-      <div class="tip-text">Vragen of opmerkingen? Neem contact op via je Body•Bloom coach of via Instagram @body_bloom_be.</div>
+      <div class="tip-text">Vragen of opmerkingen? Neem contact op via je Body•Bloom coach of volg ons op Instagram <a href="https://www.instagram.com/body_bloom_be" target="_blank" style="color:var(--accent);text-decoration:none;font-weight:600;">@body_bloom_be</a> 📸</div>
     </div>
   </div>
 </div>
@@ -1186,6 +1186,7 @@
     <button class="access-btn" onclick="checkSTRCode()">TOEGANG KRIJGEN</button>
     <div class="access-error" id="strAccessError">Ongeldige code. Probeer opnieuw.</div>
     <div class="access-link">Exclusief voor Body•Bloom klanten · <a onclick="document.getElementById('accessOverlay').classList.add('hidden');document.getElementById('disclaimer-back-btn').onclick=()=>{document.getElementById('disclaimer-screen').classList.remove('active');document.getElementById('accessOverlay').classList.remove('hidden');};showScreen('disclaimer-screen');" style="cursor:pointer;">Disclaimer</a></div>
+    <div class="access-link" style="margin-top:8px;">📸 Volg mij op Instagram <a href="https://www.instagram.com/body_bloom_be" target="_blank" style="color:#ff5533;">@body_bloom_be</a></div>
   </div>
 </div>
 
@@ -2657,8 +2658,7 @@ if (localStorage.getItem('str_programId')) {
 const STR_VALID_CODES = [
   'BB-SOFIA-ADMIN',
   // Voeg hier klantcodes toe:
-  // 'BB-FABRICE-2026',
-  // 'BB-PRESSY-2026',
+  // 'BB-CLIENT-001',
 ];
 
 function checkSTRCode() {
@@ -2679,6 +2679,9 @@ function checkSTRCode() {
 
 function showWelcomeScreen(code) {
   const isAdmin = code === 'BB-SOFIA-ADMIN';
+  // Voeg klantcodes toe hieronder:
+  // 'BB-FABRICE-2026',  // Fabrice K.
+  // 'BB-PRESSY-2026',  // Preston K.
   const name = isAdmin ? 'SOFIA' : code.replace('BB-','').replace(/-\d+$/,'').replace(/-/g,' ');
   document.getElementById('welcomeName').textContent = name;
   document.getElementById('welcomeOverlay').classList.remove('hidden');
