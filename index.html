@@ -1221,6 +1221,7 @@
   <nav class="bottom-nav">
     <div style="width:100%;">
       <div class="copyright">© 2026 <span>Sofia la Bianca</span> · Body•Bloom · <span onclick="showScreen('disclaimer-screen');document.getElementById('disclaimer-back-btn').onclick=()=>showScreen('program-select');" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Disclaimer</span></div>
+      <div class="copyright">📸 <a href="https://www.instagram.com/body_bloom_be" target="_blank" style="color:var(--accent);text-decoration:none;">@body_bloom_be</a></div>
       <div style="display:flex;">
         <div class="nav-item active" onclick="showScreen('program-select')">
           <div class="nav-icon">🏠</div>
@@ -1380,6 +1381,7 @@
   <nav class="bottom-nav">
     <div style="width:100%;">
       <div class="copyright">© 2026 <span>Sofia la Bianca</span> · Body•Bloom · <span onclick="showScreen('disclaimer-screen');document.getElementById('disclaimer-back-btn').onclick=()=>showScreen('home');" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Disclaimer</span></div>
+      <div class="copyright">📸 <a href="https://www.instagram.com/body_bloom_be" target="_blank" style="color:var(--accent);text-decoration:none;">@body_bloom_be</a></div>
       <div style="display:flex;">
         <div class="nav-item" onclick="showScreen('program-select')">
           <div class="nav-icon">🏠</div>
@@ -1514,6 +1516,7 @@
   <nav class="bottom-nav">
     <div style="width:100%;">
       <div class="copyright">© 2026 <span>Sofia la Bianca</span> · Body•Bloom · <span onclick="showScreen('disclaimer-screen');document.getElementById('disclaimer-back-btn').onclick=()=>showScreen('tips-screen');" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Disclaimer</span></div>
+      <div class="copyright">📸 <a href="https://www.instagram.com/body_bloom_be" target="_blank" style="color:var(--accent);text-decoration:none;">@body_bloom_be</a></div>
       <div style="display:flex;">
         <div class="nav-item" onclick="showScreen('program-select')">
           <div class="nav-icon">🏠</div>
@@ -2679,7 +2682,7 @@ function checkSTRCode() {
 
 function showWelcomeScreen(code) {
   const isAdmin = code === 'BB-SOFIA-ADMIN';
-  // Voeg klantcodes toe hieronder:
+   // Voeg klantcodes toe hieronder:
   // 'BB-FABRICE-2026',  // Fabrice K.
   // 'BB-PRESSY-2026',  // Preston K.
   const name = isAdmin ? 'SOFIA' : code.replace('BB-','').replace(/-\d+$/,'').replace(/-/g,' ');
